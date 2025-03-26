@@ -1,0 +1,11 @@
+/* Here is a comment */
+1 + 2 * (3 + 4) % 5;
+1 / 4;
+
+let a = 5;
+const b = 10;
+
+
+fun hello(name) -> None {
+	print("Hello: " + name);
+}
