@@ -30,7 +30,7 @@ def lex(source: str):
         elif char.isalpha(): push(lexer, identifier(lexer))
         elif '"' == char: push(lexer, string(lexer))
         elif "(" == char: push(lexer, Token(TKind.LPAR, char, None)); consume(lexer)
-        elif ")" == char: push(lexer, Token(TKind.LPAR, char, None)); consume(lexer)
+        elif ")" == char: push(lexer, Token(TKind.RPAR, char, None)); consume(lexer)
         elif "=" == char: push(lexer, Token(TKind.EQUAL, char, None)); consume(lexer)
         elif "{" == char: push(lexer, Token(TKind.LBRACE, char, None)); consume(lexer)
         elif "}" == char: push(lexer, Token(TKind.RBRACE, char, None)); consume(lexer)

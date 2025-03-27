@@ -21,6 +21,13 @@ def interp_expr(expr: Expr) -> Expr:
             return expr
         if isinstance(expr, BinOp):
             return eval_bin_op(expr)
+        if isinstance(expr, Group):
+            return eval_group(expr)
+        else:
+            perror("[interpreter-error] unimplemented expression: `{expr}`")
+
+def eval_group(expr: Group) -> Expr:
+    return interp_expr(expr.expr)
 
 def eval_bin_op(expr: BinOp) -> Expr:
     left : Expr = interp_expr(expr.left)

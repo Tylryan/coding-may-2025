@@ -32,6 +32,10 @@ class BinOp(Expr):
 class ConstInt(Expr):
     tok: Token
 
+@dataclass
+class Group(Expr):
+    expr: Expr
+
 def MK_CONST_INT(number: int):
     return ConstInt(MK_INT(number))
 
@@ -56,7 +60,7 @@ def parse_expr(parser: Parser, min_prec: int) -> Expr:
 
 def parse_binop(parser: Parser, min_prec: int) -> Expr:
 
-    left: Expr = parse_int(parser)
+    left: Expr = parse_group(parser)
 
     while precedence(peek(parser)) >= min_prec \
         and check(parser, TKind.PLUS, TKind.MINUS, TKind.STAR):
@@ -67,9 +71,32 @@ def parse_binop(parser: Parser, min_prec: int) -> Expr:
 
     return left
 
+def parse_group(parser: Parser) -> Expr:
+
+    token: Token = peek(parser)
+
+    if not check(parser, TKind.LPAR):
+        return parse_int(parser)
+
+    # LPAR is skipped with match
+    advance(parser)
+
+    # TODO(tyler): Might need to do precedence(token) + 1
+    expr: Expr = parse_expr(parser, 0)
+    if check(parser, TKind.RPAR) is False:
+        print(peek(parser))
+        perror("[parser-error] unclosed parentheses in group")
+
+    advance(parser)
+
+    return Group(expr)
 
 def parse_int(parser: Parser) -> Expr:
-    tok: Token = advance(parser)
+    tok: Token = peek(parser)
+    if check(parser, TKind.INT) is False:
+        perror(f'[parser-error] unimplemented token: {tok}')
+
+    advance(parser)
     return ConstInt(tok)
 
 
@@ -92,6 +119,7 @@ def precedence(tok: Token) -> int:
         TKind.MINUS: 45,
         TKind.STAR: 50,
         TKind.SLASH: 50,
+        TKind.LPAR: 55
     }
 
     return table.get(tok.kind, 0)
