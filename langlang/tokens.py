@@ -6,6 +6,9 @@ class TKind(Enum):
     STR=auto(),     # "..."
     IDENT=auto(),   # [a-zA-Z_][a-zA-Z_]*
 
+    VAR=auto(),     # "var"
+    NULL=auto(),     # "null"
+
     PLUS    = auto(), # + 
     MINUS   = auto(), # -
     STAR    = auto(), # *
@@ -33,3 +36,6 @@ class Token:
 # Token Helpers
 def MK_INT(number: int):
     return Token(TKind.INT, str(number), number)
+
+def MK_NULL_TOK() -> Token:
+    return Token(TKind.NULL, "null", None)

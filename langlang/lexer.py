@@ -14,12 +14,17 @@ class LexState:
     line : int
     source: str
     tokens: list[Token]
-
+    keywords: dict[str, TKind]
     def __init__(self, source: str):
         self.line   = 0
         self.index  = 0
         self.tokens = []
         self.source = source
+        self.keywords = {
+        "var": TKind.VAR,
+        "null": TKind.NULL
+    }
+
 
 def lex(source: str):
     lexer = LexState(source)
@@ -70,8 +75,12 @@ def identifier(lexer: LexState) -> Token:
     name = ""
     while peek(lexer).isalnum():
         name += consume(lexer)
+    
+    if name not in lexer.keywords:
+        return Token(TKind.IDENT, name, None)
 
-    return Token(TKind.IDENT, name, None)
+    # Then it's a keyword
+    return Token(lexer.keywords[name], name, None)
 
 def binop(lexer: LexState) -> Token | None:
     char = consume(lexer)

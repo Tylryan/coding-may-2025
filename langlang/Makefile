@@ -13,7 +13,9 @@
 # 	then run:
 # 	$ make FILE=/path/to/file.langlang
 #
-FILE?=tests/01-arithmetic.txt
+ARITH=tests/01-arithmetic.txt
+VARIABLES=tests/02-global-variables.txt
+FILE?=$(VARIABLES)
 
 
 # Since this rule is at the top of all the other rules, it is the rule

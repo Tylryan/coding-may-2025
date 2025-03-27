@@ -1,6 +1,9 @@
 from lexer import *
 from parser import *
 
+from pprint import pprint
+
+@dataclass
 class Interpreter:
     environ: dict[str, Expr]
     exprs: list[Expr]
@@ -14,22 +17,26 @@ def interpret(exprs: list[Expr]) -> Expr:
     terp = Interpreter(exprs)
 
     for expr in terp.exprs:
-        return interp_expr(expr)
+        return interp_expr(terp, expr)
 
-def interp_expr(expr: Expr) -> Expr:
-        if isinstance(expr, ConstInt):
-            return expr
-        if isinstance(expr, BinOp):
-            return eval_bin_op(expr)
-        if isinstance(expr, Group):
-            return eval_group(expr)
-        else:
-            perror("[interpreter-error] unimplemented expression: `{expr}`")
+def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
+        if isinstance(expr, ConstInt): return expr
+        if isinstance(expr, BinOp)   : return eval_bin_op(interp, expr)
+        if isinstance(expr, Group)   : return eval_group(interp, expr)
+        if isinstance(expr, VarDec)  : return eval_vardec(interp, expr)
+        if isinstance(expr, Null)    : return expr
+        else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
 
-def eval_group(expr: Group) -> Expr:
+def eval_vardec(interp: Interpreter, expr: VarDec) -> Expr:
+    interp.environ[expr.name.lexeme] = interp_expr(interp, expr.value)
+
+    print("DEBUG")
+    pprint(interp)
+
+def eval_group(interp: Interpreter, expr: Group) -> Expr:
     return interp_expr(expr.expr)
 
-def eval_bin_op(expr: BinOp) -> Expr:
+def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
     left : Expr = interp_expr(expr.left)
     right: Expr = interp_expr(expr.right)
 

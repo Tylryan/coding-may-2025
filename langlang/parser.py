@@ -4,11 +4,16 @@ from pprint import pprint
 import sys
 
 from lexer import lex, Token, TKind, perror
-from tokens import Token, TKind, MK_INT
+from tokens import Token, TKind, MK_INT, MK_NULL_TOK
 from errors import perror
 
 class Expr:
     pass
+
+@dataclass
+class VarDec(Expr):
+    name: Token
+    value: Expr
 
 @dataclass
 class Parser:
@@ -36,6 +41,14 @@ class ConstInt(Expr):
 class Group(Expr):
     expr: Expr
 
+@dataclass
+class Null(Expr):
+    token: Token
+
+def MK_NULL_EXPR() -> Expr:
+    return Null(MK_NULL_TOK())
+
+
 def MK_CONST_INT(number: int):
     return ConstInt(MK_INT(number))
 
@@ -47,16 +60,35 @@ def parse(tokens: list[Token]):
     parser = Parser(tokens)
 
     while at_end(parser) == False:
-        expr: Expr = parse_expr(parser, 0)
+        expr: Expr = parse_stmt_expr(parser)
         push(parser, expr)
 
     return parser.exprs
 
+
+
+def parse_stmt_expr(parser: Parser) -> Expr:
+    if check(parser, TKind.VAR):
+        return parse_vardec(parser)
+    
+    return parse_expr(parser, 0)
+
+def parse_vardec(parser):
+    # Assuming we're at "var"
+    assert check(parser, TKind.VAR)
+    advance(parser)
+
+    name: Token = expect(parser, TKind.IDENT, "[parser-error] expected identifier in variable declaration")
+
+    # TODO(tyler): Eventually we'll get to assignment
+    expect(parser, TKind.SEMI, "[parser-error] expected `;` after variable declaration")
+
+    return VarDec(name, MK_NULL_EXPR())
+
+
+
 def parse_expr(parser: Parser, min_prec: int) -> Expr:
     return parse_binop(parser, min_prec)
-
-
-
 
 def parse_binop(parser: Parser, min_prec: int) -> Expr:
 
@@ -159,6 +191,12 @@ def at_end(parser: Parser) -> bool:
             else False
     eof = parser.tokens[parser.index].kind == TKind.EOF
     return without_index or eof
+
+def expect(parser: Parser, kind: TKind, err_str: str) -> Token:
+    if check(parser, kind) is False:
+        perror(err_str)
+
+    return advance(parser)
 
 if __name__ == "__main__":
     import sys
