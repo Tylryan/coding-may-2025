@@ -105,10 +105,19 @@ def parse_vardec(parser):
 
     name: Token = expect(parser, TKind.IDENT, "[parser-error] expected identifier in variable declaration")
 
+    expr: Expr = MK_NULL_EXPR()
+    if check(parser, TKind.SEMI):
+        advance(parser)
+        return VarDec(name, expr)
+
+    # Has Expression after variable
+    expect(parser, TKind.EQUAL, "[parser-error] expected `=` after variable in variable declaration")
+    expr = parse_assign(parser, 0)
     # TODO(tyler): Eventually we'll get to assignment
     expect(parser, TKind.SEMI, "[parser-error] expected `;` after variable declaration")
 
-    return VarDec(name, MK_NULL_EXPR())
+
+    return VarDec(name, expr)
 
 
 
