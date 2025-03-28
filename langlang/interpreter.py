@@ -17,28 +17,70 @@ def interpret(exprs: list[Expr]) -> Expr:
     terp = Interpreter(exprs)
 
     for expr in terp.exprs:
-        return interp_expr(terp, expr)
+        interp_expr(terp, expr)
+    return terp
 
 def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
-        if isinstance(expr, ConstInt): return expr
         if isinstance(expr, BinOp)   : return eval_bin_op(interp, expr)
         if isinstance(expr, Group)   : return eval_group(interp, expr)
         if isinstance(expr, VarDec)  : return eval_vardec(interp, expr)
+        if isinstance(expr, Assign)  : return eval_assign(interp, expr)
+        if isinstance(expr, Print)   : return eval_print(interp, expr)
         if isinstance(expr, Null)    : return expr
+        if isinstance(expr, Variable): return expr
+        if isinstance(expr, ConstInt): return expr
         else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
 
-def eval_vardec(interp: Interpreter, expr: VarDec) -> Expr:
-    interp.environ[expr.name.lexeme] = interp_expr(interp, expr.value)
+def eval_print(interp: Interpreter, expr: Print) -> Expr:
+    value: Expr = interp_expr(interp, expr.expr)
 
-    print("DEBUG")
-    pprint(interp)
+    if isinstance(value, Variable):
+        name = value.token.lexeme
+        if name not in interp.environ.keys():
+            perror(f"[interpreter-error] undefined variable in print statement: `{name}`")
+        value = interp.environ.get(name)
+
+    pprint(value)
+    return value
+
+def eval_assign(interp: Interpreter, expr: Assign) -> Expr:
+    name = expr.variable.token.lexeme
+    if name not in interp.environ:
+        perror(f"[interpreter-error] trying to assign value to undeclared variable: `{name}`")
+
+    value: Expr = interp_expr(interp, expr.value)
+    interp.environ[name] = value
+    print("HERE")
+    pprint(interp.environ)
+    return value
+
+def eval_vardec(interp: Interpreter, expr: VarDec) -> Expr:
+    value: Expr = interp_expr(interp, expr.value)
+    interp.environ[expr.name.lexeme] = interp_expr(interp, value)
+
+    # print("DEBUG")
+    # pprint(interp)
+
 
 def eval_group(interp: Interpreter, expr: Group) -> Expr:
     return interp_expr(expr.expr)
 
 def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
-    left : Expr = interp_expr(expr.left)
-    right: Expr = interp_expr(expr.right)
+    left : Expr = interp_expr(interp, expr.left)
+    right: Expr = interp_expr(interp, expr.right)
+
+
+    if isinstance(left, Variable):
+        name = left.token.lexeme
+        if name not in interp.environ.keys():
+            perror(f"[interpreter-error] unefined variable: `{name}`")
+        left = interp.environ.get(name)
+
+    if isinstance(right, Variable):
+        name = right.token.lexeme
+        if name not in interp.environ.keys():
+            perror(f"[interpreter-error] unefined variable: `{name}`")
+        right = interp.environ.get(name)
 
     operator: Token = expr.op
 
@@ -73,6 +115,6 @@ if __name__ == "__main__":
     source: str = read_file(sys.argv[1])
     tokens: list[Token] = lex(source)
     exprs : list[Expr]  = parse(tokens)
-    pprint(exprs)
+    # pprint(exprs)
     print("OUTPUT\n")
     pprint(interpret(exprs))

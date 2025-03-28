@@ -11,6 +11,10 @@ class Expr:
     pass
 
 @dataclass
+class Print(Expr):
+    expr: Expr
+
+@dataclass
 class VarDec(Expr):
     name: Token
     value: Expr
@@ -26,6 +30,18 @@ class Parser:
         self.tokens = tokens
         self.exprs  = []
 
+@dataclass
+class Null(Expr):
+    token: Token
+
+@dataclass
+class Variable(Expr):
+    token: Token
+
+@dataclass
+class Assign(Expr):
+    variable: Variable
+    value: Expr
 
 @dataclass
 class BinOp(Expr):
@@ -41,9 +57,6 @@ class ConstInt(Expr):
 class Group(Expr):
     expr: Expr
 
-@dataclass
-class Null(Expr):
-    token: Token
 
 def MK_NULL_EXPR() -> Expr:
     return Null(MK_NULL_TOK())
@@ -70,8 +83,20 @@ def parse(tokens: list[Token]):
 def parse_stmt_expr(parser: Parser) -> Expr:
     if check(parser, TKind.VAR):
         return parse_vardec(parser)
+    if check(parser, TKind.PRINT):
+        return parse_print(parser)
     
     return parse_expr(parser, 0)
+
+def parse_print(parser) -> Expr:
+    # Assuming we're at "print"
+    advance(parser)
+    expr: Expr = parse_expr(parser, 0)
+
+    if check(parser, TKind.SEMI):
+        advance(parser)
+
+    return Print(expr)
 
 def parse_vardec(parser):
     # Assuming we're at "var"
@@ -88,7 +113,26 @@ def parse_vardec(parser):
 
 
 def parse_expr(parser: Parser, min_prec: int) -> Expr:
-    return parse_binop(parser, min_prec)
+    return parse_assign(parser, min_prec)
+
+def parse_assign(parser: Parser, min_prec: int) -> Expr:
+    expr: Expr = parse_binop(parser, min_prec)
+
+    is_var = isinstance(expr, Variable)
+    has_equal = check(parser, TKind.EQUAL)
+
+    if not (is_var and has_equal):
+        return expr
+
+    expect(parser, TKind.EQUAL, "[parser-error] missing `=` in assignment")
+
+    value: Expr = parse_binop(parser, min_prec)
+
+    if check(parser, TKind.SEMI):
+        advance(parser)
+
+    return Assign(expr, value)
+
 
 def parse_binop(parser: Parser, min_prec: int) -> Expr:
 
@@ -123,13 +167,19 @@ def parse_group(parser: Parser) -> Expr:
 
     return Group(expr)
 
+
 def parse_int(parser: Parser) -> Expr:
     tok: Token = peek(parser)
-    if check(parser, TKind.INT) is False:
-        perror(f'[parser-error] unimplemented token: {tok}')
+    expr: Expr = MK_NULL_EXPR()
+    if check(parser, TKind.INT):
+        expr = ConstInt(tok)
+    elif check(parser, TKind.IDENT):
+        expr = Variable(tok)
+    else:
+        perror(f"[parse-error] unimplemented token: {tok}")
 
     advance(parser)
-    return ConstInt(tok)
+    return expr
 
 
 
@@ -197,6 +247,12 @@ def expect(parser: Parser, kind: TKind, err_str: str) -> Token:
         perror(err_str)
 
     return advance(parser)
+
+def previous(parser: Parser) -> Token:
+    if parser.index < 0:
+        perror("[parser-error] previous() tried to peek out of bounds")
+
+    return parser.tokens[parser.index]
 
 if __name__ == "__main__":
     import sys

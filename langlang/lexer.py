@@ -22,7 +22,8 @@ class LexState:
         self.source = source
         self.keywords = {
         "var": TKind.VAR,
-        "null": TKind.NULL
+        "null": TKind.NULL,
+        "print": TKind.PRINT
     }
 
 

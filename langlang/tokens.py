@@ -7,7 +7,8 @@ class TKind(Enum):
     IDENT=auto(),   # [a-zA-Z_][a-zA-Z_]*
 
     VAR=auto(),     # "var"
-    NULL=auto(),     # "null"
+    NULL=auto(),    # "null"
+    PRINT=auto(),   # "print"
 
     PLUS    = auto(), # + 
     MINUS   = auto(), # -
