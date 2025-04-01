@@ -11,7 +11,7 @@ pretty much everything is an expression (well that's my intention anyway).
 ```
 var a = 10;
 
-var b = if (a > 10) { 20; }
+var b = if (a > 10) { 20 }
 
 print b; /* 20 */
 ```
