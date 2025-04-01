@@ -7,14 +7,19 @@ One of the main differences so far between my language and lox is the fact that
 pretty much everything is an expression (well that's my intention anyway).
 
 
+
 # Example
 ```
 var a = 10;
+var b = if (a > 2) { a = 20 };
 
-var b = if (a > 10) { 20 }
-
+print a; /* 20 */
 print b; /* 20 */
-```
 
+b = 10;
+print a; /* 20 */
+print b; /* 10 */
+
+```
 
 > For more examples, see the [tests directory](./tests)
