@@ -15,7 +15,8 @@
 #
 ARITH=tests/01-arithmetic.txt
 VARIABLES=tests/02-global-variables.txt
-FILE?=$(VARIABLES)
+SCOPE=tests/03-scope.txt
+FILE?=$(SCOPE)
 
 
 # Since this rule is at the top of all the other rules, it is the rule

@@ -3,14 +3,64 @@ from parser import *
 
 from pprint import pprint
 
+@dataclass 
+class Environment:
+    scope: list[dict[str, Expr]]
+    
+    def __init__(self):
+        self.scope = [{}]
+
+    def push(self):
+        old_env = self.scope[-1].copy()
+        self.scope.append(old_env)
+
+    def pop(self) -> dict[str, Expr]:
+        # Do not pop global scope
+        assert len(self.scope) != 1
+        return self.scope.pop()
+
+    def define(self, var_name: str, value: Expr):
+        self.scope[-1][var_name] = value
+
+    def assign(self, var_name: str, expr: Expr):
+        scope_index = self.get_index(var_name)
+        if scope_index > 0:
+            perror(f"[interpreter-error] cannot assign value to undeclared variable: `{var_name}`")
+        self.scope[scope_index][var_name] = expr
+
+    def get(self, var_name: str) -> Expr | None:
+        if self.exists(var_name) is False:
+            return None
+        
+        index = self.get_index(var_name)
+        return self.scope[index][var_name]
+
+    def exists(self, var_name: str) -> bool:
+        return True if self.get_index(var_name) <= 0 else False
+
+    # If in index, result will be <= 0
+    # if not in any scope, result will be > 0
+    def get_index(self, var_name) -> int:
+        i = -1
+        while not var_name in self.scope[i]:
+            if abs(i) >= len(self.scope):
+                return 1
+            i-=1
+
+        return i
+
+
+
+
+
 @dataclass
 class Interpreter:
-    environ: dict[str, Expr]
+    environ: Environment
     exprs: list[Expr]
 
     def __init__(self, exprs: list[Expr]):
         self.exprs   = exprs
-        self.environ = {}
+        self.environ = Environment()
 
 
 def interpret(exprs: list[Expr]) -> Expr:
@@ -26,17 +76,26 @@ def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
         if isinstance(expr, VarDec)  : return eval_vardec(interp, expr)
         if isinstance(expr, Assign)  : return eval_assign(interp, expr)
         if isinstance(expr, Print)   : return eval_print(interp, expr)
+        if isinstance(expr, Block)   : return eval_block(interp, expr)
         if isinstance(expr, Null)    : return expr
         if isinstance(expr, Variable): return expr
         if isinstance(expr, ConstInt): return expr
         else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
+
+def eval_block(interp: Interpreter, expr: Block) -> Expr:
+    interp.environ.push()
+    for e in expr.exprs:
+        interp_expr(interp, e)
+    interp.environ.pop()
+
+    return MK_NULL_EXPR()
 
 def eval_print(interp: Interpreter, expr: Print) -> Expr:
     value: Expr = interp_expr(interp, expr.expr)
 
     if isinstance(value, Variable):
         name = value.token.lexeme
-        if name not in interp.environ.keys():
+        if interp.environ.exists(name) is False:
             perror(f"[interpreter-error] undefined variable in print statement: `{name}`")
         value = interp.environ.get(name)
 
@@ -45,18 +104,19 @@ def eval_print(interp: Interpreter, expr: Print) -> Expr:
 
 def eval_assign(interp: Interpreter, expr: Assign) -> Expr:
     name = expr.variable.token.lexeme
-    if name not in interp.environ:
+    if interp.environ.exists(name) is False:
         perror(f"[interpreter-error] trying to assign value to undeclared variable: `{name}`")
 
+    scope_index = interp.environ.get_index(name)
     value: Expr = interp_expr(interp, expr.value)
-    interp.environ[name] = value
-    print("HERE")
+    interp.environ.assign(name, value)
+
     pprint(interp.environ)
     return value
 
 def eval_vardec(interp: Interpreter, expr: VarDec) -> Expr:
     value: Expr = interp_expr(interp, expr.value)
-    interp.environ[expr.name.lexeme] = interp_expr(interp, value)
+    interp.environ.define(expr.name.lexeme, value)
 
     # print("DEBUG")
     # pprint(interp)
@@ -72,13 +132,13 @@ def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
 
     if isinstance(left, Variable):
         name = left.token.lexeme
-        if name not in interp.environ.keys():
+        if interp.environ.exists(name) is False:
             perror(f"[interpreter-error] unefined variable: `{name}`")
         left = interp.environ.get(name)
 
     if isinstance(right, Variable):
         name = right.token.lexeme
-        if name not in interp.environ.keys():
+        if interp.environ.exists(name) is False:
             perror(f"[interpreter-error] unefined variable: `{name}`")
         right = interp.environ.get(name)
 

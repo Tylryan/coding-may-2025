@@ -44,6 +44,10 @@ class Assign(Expr):
     value: Expr
 
 @dataclass
+class Block(Expr):
+    exprs: list[Expr]
+
+@dataclass
 class BinOp(Expr):
     left : Expr
     op   : Token
@@ -60,7 +64,6 @@ class Group(Expr):
 
 def MK_NULL_EXPR() -> Expr:
     return Null(MK_NULL_TOK())
-
 
 def MK_CONST_INT(number: int):
     return ConstInt(MK_INT(number))
@@ -85,8 +88,27 @@ def parse_stmt_expr(parser: Parser) -> Expr:
         return parse_vardec(parser)
     if check(parser, TKind.PRINT):
         return parse_print(parser)
+
+    if check(parser, TKind.LBRACE):
+        return parse_block(parser)
     
     return parse_expr(parser, 0)
+
+def parse_block(parser) -> Expr:
+    # Should be on "{"
+    advance(parser)
+
+    exprs: list[Expr] = []
+
+    while not (at_end(parser) or check(parser, TKind.RBRACE)):
+        expr: Expr = parse_stmt_expr(parser)
+        exprs.append(expr)
+
+    expect(parser, TKind.RBRACE, "[parser-error] missing RBRACE in block")
+
+    return Block(exprs)
+
+    
 
 def parse_print(parser) -> Expr:
     # Assuming we're at "print"
