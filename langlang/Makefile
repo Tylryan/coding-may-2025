@@ -16,7 +16,8 @@
 ARITH=tests/01-arithmetic.txt
 VARIABLES=tests/02-global-variables.txt
 SCOPE=tests/03-scope.txt
-FILE?=$(SCOPE)
+SCOPE_FULL=tests/03-scope-full.txt
+FILE?=$(SCOPE_FULL)
 
 
 # Since this rule is at the top of all the other rules, it is the rule

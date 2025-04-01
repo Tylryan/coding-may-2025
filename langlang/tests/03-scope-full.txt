@@ -13,8 +13,13 @@ print a; /* "10" */
 var b = 5;
 print b;  /* "5" */
 {
+    /* Reassignment should alter outer scope */
     b = 10;
     print b; /* "10" */
 }
 
 print b; /* "10" */
+
+
+var c = 1;
+var c = 2; /* Should fail */

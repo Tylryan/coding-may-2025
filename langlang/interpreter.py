@@ -11,8 +11,7 @@ class Environment:
         self.scope = [{}]
 
     def push(self):
-        old_env = self.scope[-1].copy()
-        self.scope.append(old_env)
+        self.scope.append({})
 
     def pop(self) -> dict[str, Expr]:
         # Do not pop global scope
@@ -20,6 +19,8 @@ class Environment:
         return self.scope.pop()
 
     def define(self, var_name: str, value: Expr):
+        if self.get_index(var_name) == -1:
+            perror(f"[interpreter-error] cannot redeclare variable `{var_name}` in the same scope.")
         self.scope[-1][var_name] = value
 
     def assign(self, var_name: str, expr: Expr):
@@ -111,7 +112,6 @@ def eval_assign(interp: Interpreter, expr: Assign) -> Expr:
     value: Expr = interp_expr(interp, expr.value)
     interp.environ.assign(name, value)
 
-    pprint(interp.environ)
     return value
 
 def eval_vardec(interp: Interpreter, expr: VarDec) -> Expr:
