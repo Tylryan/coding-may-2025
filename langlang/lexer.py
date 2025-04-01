@@ -21,8 +21,10 @@ class LexState:
         self.tokens = []
         self.source = source
         self.keywords = {
-        "var": TKind.VAR,
-        "null": TKind.NULL,
+        "var"  : TKind.VAR,
+        "if"   : TKind.IF,
+        "else" : TKind.ELSE,
+        "null" : TKind.NULL,
         "print": TKind.PRINT
     }
 
@@ -40,8 +42,8 @@ def lex(source: str):
         elif "=" == char: push(lexer, Token(TKind.EQUAL, char, None)); consume(lexer)
         elif "{" == char: push(lexer, Token(TKind.LBRACE, char, None)); consume(lexer)
         elif "}" == char: push(lexer, Token(TKind.RBRACE, char, None)); consume(lexer)
-        elif ">" == char: push(lexer, Token(TKind.LESS, char, None)); consume(lexer)
-        elif "<" == char: push(lexer, Token(TKind.GREATER, char, None)); consume(lexer)
+        elif ">" == char: push(lexer, Token(TKind.GREATER, char, None)); consume(lexer)
+        elif "<" == char: push(lexer, Token(TKind.LESS, char, None)); consume(lexer)
         elif ";" == char: push(lexer, Token(TKind.SEMI, char, None)); consume(lexer)
         elif char in ["\n", "\r"]: lexer.line+=1; consume(lexer)
         elif char in [" ", "\t"]: consume(lexer)

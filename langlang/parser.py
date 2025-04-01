@@ -35,6 +35,14 @@ class Null(Expr):
     token: Token
 
 @dataclass
+class Tru(Expr):
+    pass
+
+@dataclass
+class Fals(Expr):
+    pass
+
+@dataclass
 class Variable(Expr):
     token: Token
 
@@ -46,6 +54,12 @@ class Assign(Expr):
 @dataclass
 class Block(Expr):
     exprs: list[Expr]
+
+@dataclass
+class If(Expr):
+    cond: Expr
+    true_block: Block
+    false_block: Block
 
 @dataclass
 class BinOp(Expr):
@@ -68,6 +82,9 @@ def MK_NULL_EXPR() -> Expr:
 def MK_CONST_INT(number: int):
     return ConstInt(MK_INT(number))
 
+def MK_BOOL_EXPR(boolean: bool):
+    return Tru() if boolean else Fals()
+
 def CONT_INT_AS_INT(ci: ConstInt) -> int:
     return ci.tok.value
 
@@ -88,11 +105,24 @@ def parse_stmt_expr(parser: Parser) -> Expr:
         return parse_vardec(parser)
     if check(parser, TKind.PRINT):
         return parse_print(parser)
-
     if check(parser, TKind.LBRACE):
         return parse_block(parser)
     
     return parse_expr(parser, 0)
+
+
+
+    
+
+def parse_print(parser) -> Expr:
+    # Assuming we're at "print"
+    advance(parser)
+    expr: Expr = parse_expr(parser, 0)
+
+    if check(parser, TKind.SEMI):
+        advance(parser)
+
+    return Print(expr)
 
 def parse_block(parser) -> Expr:
     # Should be on "{"
@@ -107,18 +137,6 @@ def parse_block(parser) -> Expr:
     expect(parser, TKind.RBRACE, "[parser-error] missing RBRACE in block")
 
     return Block(exprs)
-
-    
-
-def parse_print(parser) -> Expr:
-    # Assuming we're at "print"
-    advance(parser)
-    expr: Expr = parse_expr(parser, 0)
-
-    if check(parser, TKind.SEMI):
-        advance(parser)
-
-    return Print(expr)
 
 def parse_vardec(parser):
     # Assuming we're at "var"
@@ -147,7 +165,7 @@ def parse_expr(parser: Parser, min_prec: int) -> Expr:
     return parse_assign(parser, min_prec)
 
 def parse_assign(parser: Parser, min_prec: int) -> Expr:
-    expr: Expr = parse_binop(parser, min_prec)
+    expr: Expr = parse_if(parser, min_prec)
 
     is_var = isinstance(expr, Variable)
     has_equal = check(parser, TKind.EQUAL)
@@ -157,12 +175,32 @@ def parse_assign(parser: Parser, min_prec: int) -> Expr:
 
     expect(parser, TKind.EQUAL, "[parser-error] missing `=` in assignment")
 
-    value: Expr = parse_binop(parser, min_prec)
+    value: Expr = parse_if(parser, min_prec)
 
     if check(parser, TKind.SEMI):
         advance(parser)
 
     return Assign(expr, value)
+
+# NOTE: Our if will be an expression
+def parse_if(parser, min_prec: int) -> Expr:
+    if check(parser, TKind.IF) is False:
+        return parse_binop(parser, min_prec)
+
+    advance(parser) # Skip "if"
+
+    expect(parser, TKind.LPAR, "[parser-error] missing LPAR in if expression")
+    condition: Expr = parse_expr(parser, min_prec)
+    expect(parser, TKind.RPAR, "[parser-error] missing RPAR in if expression")
+
+    if check(parser, TKind.LBRACE) is False:
+        perror("[parser-error] missing RBRACE in if expression")
+
+    true_block: Block = parse_block(parser)
+
+    # TODO(tyler): Replace once `else` is implemented
+    return If(condition, true_block, MK_NULL_EXPR())
+    
 
 
 def parse_binop(parser: Parser, min_prec: int) -> Expr:
@@ -170,7 +208,8 @@ def parse_binop(parser: Parser, min_prec: int) -> Expr:
     left: Expr = parse_group(parser)
 
     while precedence(peek(parser)) >= min_prec \
-        and check(parser, TKind.PLUS, TKind.MINUS, TKind.STAR):
+        and check(parser, TKind.PLUS, TKind.MINUS, TKind.STAR,
+                  TKind.LESS, TKind.GREATER):
 
         operator: Token = advance(parser)
         right: Expr = parse_binop(parser, precedence(peek(parser)) + 1)
@@ -232,7 +271,9 @@ def precedence(tok: Token) -> int:
         TKind.MINUS: 45,
         TKind.STAR: 50,
         TKind.SLASH: 50,
-        TKind.LPAR: 55
+        TKind.LPAR: 55,
+        TKind.LESS: 40,
+        TKind.GREATER: 40
     }
 
     return table.get(tok.kind, 0)

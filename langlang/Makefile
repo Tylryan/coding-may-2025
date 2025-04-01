@@ -17,18 +17,18 @@ ARITH=tests/01-arithmetic.txt
 VARIABLES=tests/02-global-variables.txt
 SCOPE=tests/03-scope.txt
 SCOPE_FULL=tests/03-scope-full.txt
-FILE?=$(SCOPE_FULL)
+IF=tests/04-if.txt
+FILE?=$(IF)
 
+
+i:
+	make interpreter
 
 # Since this rule is at the top of all the other rules, it is the rule
 # executed when running `make` without any arguments.
 interpreter:
-	# TODO(tyler): As when I implement the parser, change this.
-	# When I implement the interpreter, change this again.
 	make parser
 
-i:
-	make interpreter
 interpreter:
 	python interpreter.py $(FILE)
 

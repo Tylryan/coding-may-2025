@@ -9,6 +9,8 @@ class TKind(Enum):
     VAR=auto(),     # "var"
     NULL=auto(),    # "null"
     PRINT=auto(),   # "print"
+    IF=auto(),   # "if"
+    ELSE=auto(),   # "else"
 
     PLUS    = auto(), # + 
     MINUS   = auto(), # -

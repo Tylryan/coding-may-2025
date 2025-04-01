@@ -1,0 +1,5 @@
+
+var a = 10;
+var b = if (a > 2) { 10 };
+
+print b;

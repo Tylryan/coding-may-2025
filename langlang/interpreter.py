@@ -78,18 +78,33 @@ def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
         if isinstance(expr, Assign)  : return eval_assign(interp, expr)
         if isinstance(expr, Print)   : return eval_print(interp, expr)
         if isinstance(expr, Block)   : return eval_block(interp, expr)
+        if isinstance(expr, If)      : return eval_if(interp, expr)
         if isinstance(expr, Null)    : return expr
         if isinstance(expr, Variable): return expr
         if isinstance(expr, ConstInt): return expr
         else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
 
+def eval_if(interp: Interpreter, expr: If) -> Expr:
+    
+    cond: Expr = interp_expr(interp, expr.cond)
+
+    res: Expr = MK_NULL_EXPR()
+    if isinstance(cond, Tru):
+        res = interp_expr(interp, expr.true_block)
+    else:
+        res = interp_expr(interp, expr.false_block)
+
+    return res
+
+# Returns the last evaluated expression
 def eval_block(interp: Interpreter, expr: Block) -> Expr:
     interp.environ.push()
+    last_expr: Expr = MK_NULL_EXPR()
     for e in expr.exprs:
-        interp_expr(interp, e)
+        last_expr = interp_expr(interp, e)
     interp.environ.pop()
 
-    return MK_NULL_EXPR()
+    return last_expr
 
 def eval_print(interp: Interpreter, expr: Print) -> Expr:
     value: Expr = interp_expr(interp, expr.expr)
@@ -148,6 +163,8 @@ def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
         return MK_CONST_INT(CONT_INT_AS_INT(left) + CONT_INT_AS_INT(right))
     elif operator.kind == TKind.STAR:
         return MK_CONST_INT(CONT_INT_AS_INT(left) * CONT_INT_AS_INT(right))
+    elif operator.kind == TKind.GREATER:
+        return MK_BOOL_EXPR(CONT_INT_AS_INT(left) > CONT_INT_AS_INT(right))
     else:
         from errors import perror
         perror(f"[interpreter-error] unimplemented operator on line [TODO]: `{operator.lexeme}`")
