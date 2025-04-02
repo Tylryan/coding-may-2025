@@ -8,9 +8,14 @@ pretty much everything is an expression (well that's my intention anyway).
 
 
 
-# Example
+# Examples
+The following example demonstrates that "ifs" are if-expressions instead
+of regular statements. Additionally, a variable can be set to the result
+of an assignment.
+
 ```
 var a = 10;
+/* `b` is equal to 20 */
 var b = if (a > 2) { a = 20 };
 
 print a; /* 20 */
