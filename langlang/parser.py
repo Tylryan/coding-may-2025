@@ -58,8 +58,8 @@ class Block(Expr):
 @dataclass
 class If(Expr):
     cond: Expr
-    true_block: Block
-    false_block: Block
+    then_block: Block
+    else_block: Block
 
 @dataclass
 class BinOp(Expr):
@@ -198,8 +198,18 @@ def parse_if(parser, min_prec: int) -> Expr:
 
     true_block: Block = parse_block(parser)
 
+    else_block: Expr = MK_NULL_EXPR()
+
+    # NOTE: This takes care of 'if else if'
+    if check(parser, TKind.ELSE):
+        advance(parser)
+        if check(parser, TKind.IF):
+            else_block = parse_if(parser, min_prec)
+        else:
+            else_block = parse_block(parser)
+
     # TODO(tyler): Replace once `else` is implemented
-    return If(condition, true_block, MK_NULL_EXPR())
+    return If(condition, true_block, else_block)
     
 
 

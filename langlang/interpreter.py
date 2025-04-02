@@ -90,9 +90,9 @@ def eval_if(interp: Interpreter, expr: If) -> Expr:
 
     res: Expr = MK_NULL_EXPR()
     if isinstance(cond, Tru):
-        res = interp_expr(interp, expr.true_block)
+        res = interp_expr(interp, expr.then_block)
     else:
-        res = interp_expr(interp, expr.false_block)
+        res = interp_expr(interp, expr.else_block)
 
     return res
 

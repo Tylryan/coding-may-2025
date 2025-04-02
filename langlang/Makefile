@@ -18,7 +18,8 @@ VARIABLES=tests/02-global-variables.txt
 SCOPE=tests/03-scope.txt
 SCOPE_FULL=tests/03-scope-full.txt
 IF=tests/04-if.txt
-FILE?=$(IF)
+IF_ELSE=tests/04-if-else.txt
+FILE?=$(IF_ELSE)
 
 
 i:

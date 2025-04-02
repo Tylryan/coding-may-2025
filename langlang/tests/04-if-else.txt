@@ -1,0 +1,15 @@
+
+var a = 10;
+
+/* Prints "5" */
+if      (a > 100) { print 100; }
+else if (a > 5 )  { print 5;   }
+else              { print 0;   }
+
+
+var b = if      (a > 100) { 100 }
+        else if (a > 50)  { 50  }
+        else              { 1   };
+
+/* Prints "1" */
+print b;
