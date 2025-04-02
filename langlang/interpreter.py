@@ -83,6 +83,7 @@ def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
         if isinstance(expr, Null)    : return expr
         if isinstance(expr, Variable): return expr
         if isinstance(expr, ConstInt): return expr
+        if isinstance(expr, Break)   : return expr
         else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
 
 
@@ -90,9 +91,11 @@ def eval_while(interp: Interpreter, expr: While) -> Expr:
     res = MK_NULL_EXPR()
     while True:
         cond = interp_expr(interp, expr.cond)
-        if isinstance(cond, Fals):
+        if is_falsy(cond):
             break
         res = eval_block(interp, expr.block)
+        if isinstance(res, Break):
+            break
 
     return res
 
@@ -113,7 +116,10 @@ def eval_block(interp: Interpreter, expr: Block) -> Expr:
     interp.environ.push()
     last_expr: Expr = MK_NULL_EXPR()
     for e in expr.exprs:
-        last_expr = interp_expr(interp, e)
+        expression = interp_expr(interp, e)
+        if isinstance(last_expr, Break):
+            break
+        last_expr = expression
     interp.environ.pop()
 
     return last_expr
@@ -190,6 +196,13 @@ def checks(classname, *exprs: Expr) -> bool:
         if isinstance(expr, classname) is False:
             return False
     return True
+
+def is_falsy(expr: Expr) -> bool:
+    if isinstance(expr, ConstInt):
+        return True if expr.tok.value == 0 else False
+    if isinstance(expr, Fals):
+        return True
+    return False
 
 
 if __name__ == "__main__":

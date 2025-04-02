@@ -39,6 +39,10 @@ class Tru(Expr):
     pass
 
 @dataclass
+class Break(Expr):
+    token: Token
+
+@dataclass
 class Fals(Expr):
     pass
 
@@ -275,6 +279,11 @@ def parse_int(parser: Parser) -> Expr:
         expr = ConstInt(tok)
     elif check(parser, TKind.IDENT):
         expr = Variable(tok)
+    elif check(parser, TKind.BREAK):
+        expr = Break(tok)
+        # Skips "break", next advance below
+        # will skip semicolon
+        advance(parser)
     else:
         perror(f"[parse-error] unimplemented token: {tok}")
 

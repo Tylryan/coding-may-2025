@@ -20,7 +20,8 @@ SCOPE_FULL=tests/03-scope-full.txt
 IF=tests/04-if.txt
 IF_ELSE=tests/04-if-else.txt
 WHILE=tests/05-while.txt
-FILE?=$(WHILE)
+WHILE_BREAK=tests/05-while-break.txt
+FILE?=$(WHILE_BREAK)
 
 
 i:
