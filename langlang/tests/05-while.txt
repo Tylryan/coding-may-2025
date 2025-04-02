@@ -9,7 +9,8 @@ print a; /* 10 */
 a = 0;
 var b = while (a < 10) { 
     /* NOTE: This will be the last expression
-     * evaluated and thus the implicit return.
+     * evaluated and thus the block's implicit 
+     * return value.
      */
     a = a +1; 
 };
