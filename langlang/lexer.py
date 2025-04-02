@@ -24,6 +24,7 @@ class LexState:
         "var"  : TKind.VAR,
         "if"   : TKind.IF,
         "else" : TKind.ELSE,
+        "while": TKind.WHILE,
         "null" : TKind.NULL,
         "print": TKind.PRINT
     }

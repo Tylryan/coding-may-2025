@@ -19,7 +19,8 @@ SCOPE=tests/03-scope.txt
 SCOPE_FULL=tests/03-scope-full.txt
 IF=tests/04-if.txt
 IF_ELSE=tests/04-if-else.txt
-FILE?=$(IF_ELSE)
+WHILE=tests/05-while.txt
+FILE?=$(WHILE)
 
 
 i:

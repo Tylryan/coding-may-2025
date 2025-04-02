@@ -62,6 +62,11 @@ class If(Expr):
     else_block: Block
 
 @dataclass
+class While(Expr):
+    cond: Expr
+    block: Block
+
+@dataclass
 class BinOp(Expr):
     left : Expr
     op   : Token
@@ -185,7 +190,7 @@ def parse_assign(parser: Parser, min_prec: int) -> Expr:
 # NOTE: Our if will be an expression
 def parse_if(parser, min_prec: int) -> Expr:
     if check(parser, TKind.IF) is False:
-        return parse_binop(parser, min_prec)
+        return parse_while(parser, min_prec)
 
     advance(parser) # Skip "if"
 
@@ -211,7 +216,22 @@ def parse_if(parser, min_prec: int) -> Expr:
     # TODO(tyler): Replace once `else` is implemented
     return If(condition, true_block, else_block)
     
+def parse_while(parser: Parser, min_prec: int) -> Expr:
+    if check(parser, TKind.WHILE) is False:
+        return parse_binop(parser, min_prec)
 
+    advance(parser) # Skip "while"
+
+    expect(parser, TKind.LPAR, "[parser-error] missing LPAR in while expression")
+    condition: Expr = parse_expr(parser, min_prec)
+    expect(parser, TKind.RPAR, "[parser-error] missing RPAR in while expression")
+
+    if check(parser, TKind.LBRACE) is False:
+        perror("[parser-error] missing RBRACE in while expression")
+
+    block: Block = parse_block(parser)
+
+    return While(condition, block)
 
 def parse_binop(parser: Parser, min_prec: int) -> Expr:
 

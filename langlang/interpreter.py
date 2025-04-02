@@ -79,10 +79,22 @@ def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
         if isinstance(expr, Print)   : return eval_print(interp, expr)
         if isinstance(expr, Block)   : return eval_block(interp, expr)
         if isinstance(expr, If)      : return eval_if(interp, expr)
+        if isinstance(expr, While)   : return eval_while(interp, expr)
         if isinstance(expr, Null)    : return expr
         if isinstance(expr, Variable): return expr
         if isinstance(expr, ConstInt): return expr
         else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
+
+
+def eval_while(interp: Interpreter, expr: While) -> Expr:
+    res = MK_NULL_EXPR()
+    while True:
+        cond = interp_expr(interp, expr.cond)
+        if isinstance(cond, Fals):
+            break
+        res = eval_block(interp, expr.block)
+
+    return res
 
 def eval_if(interp: Interpreter, expr: If) -> Expr:
     
@@ -165,6 +177,8 @@ def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
         return MK_CONST_INT(CONT_INT_AS_INT(left) * CONT_INT_AS_INT(right))
     elif operator.kind == TKind.GREATER:
         return MK_BOOL_EXPR(CONT_INT_AS_INT(left) > CONT_INT_AS_INT(right))
+    elif operator.kind == TKind.LESS:
+        return MK_BOOL_EXPR(CONT_INT_AS_INT(left) < CONT_INT_AS_INT(right))
     else:
         from errors import perror
         perror(f"[interpreter-error] unimplemented operator on line [TODO]: `{operator.lexeme}`")
