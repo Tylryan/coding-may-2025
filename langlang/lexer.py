@@ -4,6 +4,8 @@ from pprint import pprint
 from errors import perror
 from tokens import Token, TKind
 
+
+import re
 import sys
 
 
@@ -23,6 +25,7 @@ class LexState:
         self.keywords = {
         "var"  : TKind.VAR,
         "fun"  : TKind.FUN,
+        "return": TKind.RETURN,
         "if"   : TKind.IF,
         "else" : TKind.ELSE,
         "while": TKind.WHILE,
@@ -80,7 +83,8 @@ def string(lexer: LexState) -> Token:
 
 def identifier(lexer: LexState) -> Token:
     name = ""
-    while peek(lexer).isalnum():
+    while re.match(r"[a-zA-Z_]+", peek(lexer)):
+    #while peek(lexer).isalnum():
         name += consume(lexer)
     
     if name not in lexer.keywords:

@@ -19,7 +19,14 @@ class Environment:
         return self.scope.pop()
 
     def define(self, var_name: str, value: Expr):
-        if self.get_index(var_name) == -1:
+        # I'm allowing redeclarations in global scope as
+        # there was an issue with declaring parameters of
+        # two different functions with the same name.
+        # E.g.
+        # fun one(number) {}
+        # fun two(number) {} // Would be considered redeclaring `number` in the same scope.
+        only_globals = len(self.scope) == 1
+        if self.get_index(var_name) == -1 and not only_globals:
             perror(f"[interpreter-error] cannot redeclare variable `{var_name}` in the same scope.")
         self.scope[-1][var_name] = value
 
@@ -86,11 +93,15 @@ def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
         if isinstance(expr, While)   : return eval_while(interp, expr)
         if isinstance(expr, Fun)     : return eval_fundec(interp, expr)
         if isinstance(expr, FunCall) : return eval_funcall(interp, expr)
+        if isinstance(expr, Return)  : return eval_return(interp, expr)
         if isinstance(expr, Null)    : return expr
         if isinstance(expr, Variable): return expr
         if isinstance(expr, ConstInt): return expr
         if isinstance(expr, Break)   : return expr
         else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
+
+def eval_return(interp: Interpreter, expr: Return) -> Expr:
+    return expr
 
 def eval_funcall(interp: Interpreter, expr: FunCall) -> Expr:
     # Does function exist?
@@ -114,7 +125,11 @@ def eval_funcall(interp: Interpreter, expr: FunCall) -> Expr:
         interp.environ.define(param.lexeme, arg)
 
 
-    return eval_block(interp, lfun.fun.body)
+    res = eval_block(interp, lfun.fun.body)
+    if isinstance(res, Return):
+        return interp_expr(interp, res.expr)
+    else:
+        return res
 
 
 def eval_fundec(interp: Interpreter, expr: Fun) -> Expr:
@@ -154,6 +169,9 @@ def eval_block(interp: Interpreter, expr: Block) -> Expr:
     for e in expr.exprs:
         expression = interp_expr(interp, e)
         if isinstance(last_expr, Break):
+            break
+        if isinstance(expression, Return):
+            last_expr = expression
             break
         last_expr = expression
     interp.environ.pop()
@@ -257,4 +275,4 @@ if __name__ == "__main__":
     exprs : list[Expr]  = parse(tokens)
     # pprint(exprs)
     print("OUTPUT\n")
-    pprint(interpret(exprs))
+    interpret(exprs)

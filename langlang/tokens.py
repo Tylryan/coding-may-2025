@@ -8,6 +8,7 @@ class TKind(Enum):
 
     VAR=auto(),     # "var"
     FUN=auto(),     # "fun"
+    RETURN=auto(),  # "return"
     NULL=auto(),    # "null"
     PRINT=auto(),   # "print"
 

@@ -3,7 +3,7 @@
 
 var outer = 10;
 fun add(a, b) {
-    print a + b + outer;
+    a + b + outer
 }
 
-add(1,2);
+print add(1,2);

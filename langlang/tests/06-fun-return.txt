@@ -1,0 +1,20 @@
+/* Demonstrates a function that implicitly returns
+ * the last evaluated expression.
+ */
+fun implicit_return() { 1 }
+
+/* Demonstrates an early return */
+fun early_return(number) {
+    if (number > 5 ) { return 1; }
+    return 0;
+}
+
+/* A slick implicit return with an if expression */
+fun slick_return(number) {
+    if (number > 5) { 1 } 
+    else            { 0 }
+}
+
+print implicit_return();  /* 1 */
+print early_return(100);  /* 1 */
+print slick_return(2);    /* 0 */

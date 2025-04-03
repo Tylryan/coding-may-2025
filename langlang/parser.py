@@ -11,6 +11,10 @@ class Expr:
     pass
 
 @dataclass
+class Return(Expr):
+    expr: Expr
+
+@dataclass
 class Block(Expr):
     exprs: list[Expr]
 
@@ -147,8 +151,25 @@ def parse_stmt_expr(parser: Parser) -> Expr:
         return parse_fundec(parser)
     if check(parser, TKind.LBRACE):
         return parse_block(parser)
+    if check(parser, TKind.RETURN):
+        return parse_return(parser)
     
     return parse_expr(parser, 0)
+
+
+def parse_return(parser) -> Expr:
+    # Skip "return"
+    advance(parser)
+
+    if check(parser, TKind.SEMI):
+        return Return(MK_NULL_EXPR())
+
+    res: Expr = parse_expr(parser, 0)
+
+    if check(parser, TKind.SEMI):
+        advance(parser)
+
+    return Return(res)
 
 
 def parse_print(parser) -> Expr:

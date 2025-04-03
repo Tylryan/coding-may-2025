@@ -23,7 +23,8 @@ WHILE=tests/05-while.txt
 WHILE_BREAK=tests/05-while-break.txt
 FUN=tests/06-functions.txt
 FUN_PARAMS=tests/06-fun-params.txt
-FILE?=$(FUN_PARAMS)
+FUN_RETURN=tests/06-fun-return.txt
+FILE?=$(FUN_RETURN)
 
 
 i:
