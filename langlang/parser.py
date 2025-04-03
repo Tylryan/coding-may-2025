@@ -11,6 +11,10 @@ class Expr:
     pass
 
 @dataclass
+class Block(Expr):
+    exprs: list[Expr]
+
+@dataclass
 class Print(Expr):
     expr: Expr
 
@@ -18,6 +22,21 @@ class Print(Expr):
 class VarDec(Expr):
     name: Token
     value: Expr
+
+@dataclass
+class Fun(Expr):
+    name  : Token
+    params: list[Token]
+    body  : Block
+    arity : int
+
+    def __init__(self, name, params, body):
+        assert isinstance(params, list)
+
+        self.name   = name
+        self.params = params
+        self.body   = body
+        self.arity  = len(params)
 
 @dataclass
 class Parser:
@@ -55,9 +74,6 @@ class Assign(Expr):
     variable: Variable
     value: Expr
 
-@dataclass
-class Block(Expr):
-    exprs: list[Expr]
 
 @dataclass
 class If(Expr):
@@ -75,6 +91,19 @@ class BinOp(Expr):
     left : Expr
     op   : Token
     right: Expr
+
+@dataclass
+class FunCall(Expr):
+    name : Token
+    args : list[Expr]
+    arity: int
+
+    def __init__(self, name, args):
+        assert isinstance(args, list)
+
+        self.name  = name
+        self.args  = args
+        self.arity = len(args)
 
 @dataclass
 class ConstInt(Expr):
@@ -114,14 +143,13 @@ def parse_stmt_expr(parser: Parser) -> Expr:
         return parse_vardec(parser)
     if check(parser, TKind.PRINT):
         return parse_print(parser)
+    if check(parser, TKind.FUN):
+        return parse_fundec(parser)
     if check(parser, TKind.LBRACE):
         return parse_block(parser)
     
     return parse_expr(parser, 0)
 
-
-
-    
 
 def parse_print(parser) -> Expr:
     # Assuming we're at "print"
@@ -146,6 +174,48 @@ def parse_block(parser) -> Expr:
     expect(parser, TKind.RBRACE, "[parser-error] missing RBRACE in block")
 
     return Block(exprs)
+
+# Currently functions will not be expressions, but statements
+def parse_fundec(parser):
+    # "fun" IDENT "(" PARAMS? ")" BLOCK
+    # PARAMS = PARAM ("," PARAM)
+
+    # Skip fun keyword
+    advance(parser)
+
+    name: Token = expect(parser, TKind.IDENT, 
+                         "[parser-error] missing name in function declaration.")
+
+    expect(parser, TKind.LPAR, 
+           f"[parser-error] missing LPAR in function declaration: `{name.lexeme}`")
+    
+    params: list[Token] = []
+
+    if check(parser, TKind.RPAR):
+        # Skip RPAR
+        advance(parser)
+        block: Block = parse_block(parser)
+        return Fun(name, params, block)
+
+    # at this point we know the function has parameters
+    while check(parser, TKind.RPAR) is False:
+        if at_end(parser):
+            perror(f"[parser-error] missing RPAR in function declaration: `{name.lexeme}`")
+
+        params.append(advance(parser))
+
+        if check(parser, TKind.COMMA):
+            advance(parser)
+
+    expect(parser, TKind.RPAR, 
+           f"[parser-error] missing RPAR in function declaration: `{name.lexeme}`")
+    if check(parser, TKind.LBRACE) is False:
+        perror(f"[parser-error] missing LBRACE in function declaration: `{name.lexeme}`")
+
+    block: Block = parse_block(parser)
+
+    return Fun(name, params, block)
+
 
 def parse_vardec(parser):
     # Assuming we're at "var"
@@ -239,7 +309,7 @@ def parse_while(parser: Parser, min_prec: int) -> Expr:
 
 def parse_binop(parser: Parser, min_prec: int) -> Expr:
 
-    left: Expr = parse_group(parser)
+    left: Expr = parse_group(parser, min_prec)
 
     while precedence(peek(parser)) >= min_prec \
         and check(parser, TKind.PLUS, TKind.MINUS, TKind.STAR,
@@ -251,12 +321,12 @@ def parse_binop(parser: Parser, min_prec: int) -> Expr:
 
     return left
 
-def parse_group(parser: Parser) -> Expr:
+def parse_group(parser: Parser, min_prec: int) -> Expr:
 
     token: Token = peek(parser)
 
     if not check(parser, TKind.LPAR):
-        return parse_int(parser)
+        return parse_funcall(parser, min_prec)
 
     # LPAR is skipped with match
     advance(parser)
@@ -270,6 +340,45 @@ def parse_group(parser: Parser) -> Expr:
     advance(parser)
 
     return Group(expr)
+
+def parse_funcall(parser: Parser, min_prec: int) -> Expr:
+    # IDENT ("(" ARGS? ")")+
+    # ARGS = ARG ("," ARG)*
+
+    expr: Expr = parse_int(parser)
+
+    if check(parser, TKind.LPAR) is False:
+        return expr
+
+    # Skip LPAR
+    advance(parser)
+    args: list[Expr] = []
+
+    if check(parser, TKind.RPAR):
+        advance(parser)
+        if check(parser, TKind.SEMI):
+            advance(parser)
+        return FunCall(expr, args)
+
+
+    while at_end(parser) is False:
+        expression: Expr = parse_expr(parser, min_prec)
+        args.append(expression)
+
+        if check(parser, TKind.COMMA) is False:
+            break
+
+        advance(parser)
+
+    expect(parser, TKind.RPAR, f"[parser-error] missing RPAR in function call: `{expr}`")
+
+    # Just in case the function call is itself a statement expression
+    if check(parser,TKind.SEMI):
+        advance(parser)
+
+    return FunCall(expr, args)
+
+
 
 
 def parse_int(parser: Parser) -> Expr:

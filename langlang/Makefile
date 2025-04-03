@@ -21,7 +21,8 @@ IF=tests/04-if.txt
 IF_ELSE=tests/04-if-else.txt
 WHILE=tests/05-while.txt
 WHILE_BREAK=tests/05-while-break.txt
-FILE?=$(WHILE_BREAK)
+FUN=tests/06-functions.txt
+FILE?=$(FUN)
 
 
 i:

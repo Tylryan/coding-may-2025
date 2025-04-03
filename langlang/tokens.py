@@ -7,6 +7,7 @@ class TKind(Enum):
     IDENT=auto(),   # [a-zA-Z_][a-zA-Z_]*
 
     VAR=auto(),     # "var"
+    FUN=auto(),     # "fun"
     NULL=auto(),    # "null"
     PRINT=auto(),   # "print"
 
@@ -21,15 +22,17 @@ class TKind(Enum):
     STAR    = auto(), # *
     SLASH   = auto(), # /
     MOD     = auto(), # %
+
     EQUAL   = auto(), # =
     LESS    = auto(), # =
     GREATER = auto(), # =
 
-    LPAR=auto(),   # (
-    RPAR=auto(),   # )
-    LBRACE=auto(), # {
-    RBRACE=auto(), # }
-    SEMI=auto(),   # ;
+    LPAR=auto(),   # "("
+    RPAR=auto(),   # ")"
+    LBRACE=auto(), # "{"
+    RBRACE=auto(), # "}"
+    SEMI=auto(),   # ";"
+    COMMA=auto(),  # ","
 
 
     EOF =auto()
