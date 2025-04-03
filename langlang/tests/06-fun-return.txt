@@ -15,6 +15,16 @@ fun slick_return(number) {
     else            { 0 }
 }
 
-print implicit_return();  /* 1 */
-print early_return(100);  /* 1 */
-print slick_return(2);    /* 0 */
+/* TODO(tyler): This does not return the correct output. */
+fun fib(number) {
+    if (number < 3) {
+        return 1;
+    }
+
+    return fib(number - 1) + fib(number - 2);
+}
+
+print implicit_return(); /* 1 */
+print early_return(100); /* 1 */
+print slick_return(2);   /* 0 */
+print fib(5);            /* incorrectly produces 4 */

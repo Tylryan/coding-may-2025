@@ -52,6 +52,8 @@ def lex(source: str):
         elif "<" == char: push(lexer, Token(TKind.LESS, char, None)); consume(lexer)
         elif ";" == char: push(lexer, Token(TKind.SEMI, char, None)); consume(lexer)
         elif "," == char: push(lexer, Token(TKind.COMMA, char, None)); consume(lexer)
+        # TODO(tyler): Eventually this will extend to `--`.
+        elif "-" == char: push(lexer, Token(TKind.MINUS, char, None)); consume(lexer)
         elif char in ["\n", "\r"]: lexer.line+=1; consume(lexer)
         elif char in [" ", "\t"]: consume(lexer)
         elif is_binop(char):

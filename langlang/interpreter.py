@@ -233,6 +233,8 @@ def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
 
     if operator.kind == TKind.PLUS:
         return MK_CONST_INT(CONT_INT_AS_INT(left) + CONT_INT_AS_INT(right))
+    if operator.kind == TKind.MINUS:
+        return MK_CONST_INT(CONT_INT_AS_INT(left) - CONT_INT_AS_INT(right))
     elif operator.kind == TKind.STAR:
         return MK_CONST_INT(CONT_INT_AS_INT(left) * CONT_INT_AS_INT(right))
     elif operator.kind == TKind.GREATER:
