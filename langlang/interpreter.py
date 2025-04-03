@@ -100,6 +100,20 @@ def eval_funcall(interp: Interpreter, expr: FunCall) -> Expr:
     if not lfun:
         perror(f"[interpreter-error] attempting to call undefined function: `{fun_name}`")
 
+    # Does the arity match?
+    dec_arity = lfun.fun.arity
+    call_arity = expr.arity
+    
+    if call_arity > dec_arity:
+        perror(f"[interpreter-error] function called with too many arguments. expected {dec_arity}, but found {call_arity} in `{fun_name}`")
+    elif call_arity < dec_arity:
+        perror(f"[interpreter-error] function called with too few arguments. expected {dec_arity}, but found {call_arity} in `{fun_name}`")
+
+    for i, param in enumerate(lfun.fun.params):
+        arg = interp_expr(interp, expr.args[i])
+        interp.environ.define(param.lexeme, arg)
+
+
     return eval_block(interp, lfun.fun.body)
 
 
@@ -188,13 +202,13 @@ def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
     if isinstance(left, Variable):
         name = left.token.lexeme
         if interp.environ.exists(name) is False:
-            perror(f"[interpreter-error] unefined variable: `{name}`")
+            perror(f"[interpreter-error] undefined variable: `{name}`")
         left = interp.environ.get(name)
 
     if isinstance(right, Variable):
         name = right.token.lexeme
         if interp.environ.exists(name) is False:
-            perror(f"[interpreter-error] unefined variable: `{name}`")
+            perror(f"[interpreter-error] undefined variable: `{name}`")
         right = interp.environ.get(name)
 
     operator: Token = expr.op
