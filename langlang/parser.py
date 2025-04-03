@@ -94,7 +94,7 @@ class BinOp(Expr):
 
 @dataclass
 class FunCall(Expr):
-    name : Token
+    name : Variable
     args : list[Expr]
     arity: int
 

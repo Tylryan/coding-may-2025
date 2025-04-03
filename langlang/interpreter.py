@@ -63,6 +63,10 @@ class Interpreter:
         self.exprs   = exprs
         self.environ = Environment()
 
+@dataclass
+class LoxFun(Expr):
+    fun: Fun
+    closure: Environment
 
 def interpret(exprs: list[Expr]) -> Expr:
     terp = Interpreter(exprs)
@@ -80,12 +84,30 @@ def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
         if isinstance(expr, Block)   : return eval_block(interp, expr)
         if isinstance(expr, If)      : return eval_if(interp, expr)
         if isinstance(expr, While)   : return eval_while(interp, expr)
+        if isinstance(expr, Fun)     : return eval_fundec(interp, expr)
+        if isinstance(expr, FunCall) : return eval_funcall(interp, expr)
         if isinstance(expr, Null)    : return expr
         if isinstance(expr, Variable): return expr
         if isinstance(expr, ConstInt): return expr
         if isinstance(expr, Break)   : return expr
         else: perror(f"[interpreter-error] unimplemented expression: `{expr}`")
 
+def eval_funcall(interp: Interpreter, expr: FunCall) -> Expr:
+    # Does function exist?
+    fun_name: str = expr.name.token.lexeme
+    lfun: LoxFun | None = interp.environ.get(fun_name)
+
+    if not lfun:
+        perror(f"[interpreter-error] attempting to call undefined function: `{fun_name}`")
+
+    return eval_block(interp, lfun.fun.body)
+
+
+def eval_fundec(interp: Interpreter, expr: Fun) -> Expr:
+    name_tok: Token = expr.name
+    closure: Environment = interp.environ
+    interp.environ.define(name_tok.lexeme, LoxFun(expr, closure))
+    return MK_NULL_EXPR()
 
 def eval_while(interp: Interpreter, expr: While) -> Expr:
     res = MK_NULL_EXPR()

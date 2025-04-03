@@ -1,7 +1,15 @@
 
 /* A simple function with no return */
-fun add(a, b) {
+
+/* This function should be able to take
+ * the `a` from the outer scope and add
+ * it to `b` in the inner scope.
+ */
+var a = 10;
+fun add() {
+    var b = 1;
     print a + b;
 }
 
-add(1, 2);
+
+add();
