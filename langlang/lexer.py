@@ -47,11 +47,11 @@ def lex(source: str):
         elif '"' == char: push(lexer, string(lexer))
         elif "(" == char: push(lexer, Token(TKind.LPAR, char, None)); consume(lexer)
         elif ")" == char: push(lexer, Token(TKind.RPAR, char, None)); consume(lexer)
-        elif "=" == char: push(lexer, Token(TKind.EQUAL, char, None)); consume(lexer)
+        elif "=" == char: push(lexer, equals(lexer))
+        elif ">" == char: push(lexer, greater(lexer))
+        elif "<" == char: push(lexer, less(lexer)); consume(lexer)
         elif "{" == char: push(lexer, Token(TKind.LBRACE, char, None)); consume(lexer)
         elif "}" == char: push(lexer, Token(TKind.RBRACE, char, None)); consume(lexer)
-        elif ">" == char: push(lexer, Token(TKind.GREATER, char, None)); consume(lexer)
-        elif "<" == char: push(lexer, Token(TKind.LESS, char, None)); consume(lexer)
         elif ";" == char: push(lexer, Token(TKind.SEMI, char, None)); consume(lexer)
         elif "," == char: push(lexer, Token(TKind.COMMA, char, None)); consume(lexer)
         elif "." == char: push(lexer, Token(TKind.DOT, char, None)); consume(lexer)
@@ -69,6 +69,34 @@ def lex(source: str):
     push(lexer, Token(TKind.EOF, "EOF", None))
     return lexer.tokens
 
+def less(lexer: LexState) -> Token:
+    consume(lexer)
+
+    if peek(lexer) != "=":
+        consume(lexer)
+        return Token(TKind.LESS, "<", None)
+
+    consume(lexer)
+    return Token(TKind.LESS_EQUAL, "<=", None)
+
+def greater(lexer: LexState) -> Token:
+    consume(lexer)
+
+    if peek(lexer) != "=":
+        consume(lexer)
+        return Token(TKind.GREATER, ">", None)
+
+    consume(lexer)
+    return Token(TKind.GREATER_EQUAL, ">=", None)
+
+def equals(lexer: LexState) -> Token:
+    consume(lexer)
+    # Currently on "="
+    if peek(lexer) != "=":
+        return Token(TKind.EQUAL, "=", None)
+
+    consume(lexer)
+    return Token(TKind.EQUAL_EQUAL, "==", None)
 
 def string(lexer: LexState) -> Token:
     consume(lexer)

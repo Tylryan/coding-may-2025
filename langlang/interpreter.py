@@ -243,8 +243,14 @@ def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
             return MK_CONST_INT(CONT_INT_AS_INT(left) * CONT_INT_AS_INT(right))
         elif operator.kind == TKind.GREATER:
             return MK_BOOL_EXPR(CONT_INT_AS_INT(left) > CONT_INT_AS_INT(right))
+        elif operator.kind == TKind.GREATER_EQUAL:
+            return MK_BOOL_EXPR(CONT_INT_AS_INT(left) >= CONT_INT_AS_INT(right))
         elif operator.kind == TKind.LESS:
             return MK_BOOL_EXPR(CONT_INT_AS_INT(left) < CONT_INT_AS_INT(right))
+        elif operator.kind == TKind.LESS_EQUAL:
+            return MK_BOOL_EXPR(CONT_INT_AS_INT(left) <= CONT_INT_AS_INT(right))
+        elif operator.kind == TKind.EQUAL_EQUAL:
+            return MK_BOOL_EXPR(CONT_INT_AS_INT(left) == CONT_INT_AS_INT(right))
         else:
             from errors import perror
             perror(f"[interpreter-error] unimplemented operator on line [TODO]: `{operator.lexeme}`")

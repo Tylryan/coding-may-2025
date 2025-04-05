@@ -353,7 +353,8 @@ def parse_binop(parser: Parser, min_prec: int) -> Expr:
 
     while precedence(peek(parser)) >= min_prec \
         and check(parser, TKind.PLUS, TKind.MINUS, TKind.STAR,
-                  TKind.LESS, TKind.GREATER):
+                  TKind.LESS, TKind.GREATER,
+                  TKind.EQUAL_EQUAL, TKind.LESS_EQUAL, TKind.GREATER_EQUAL):
 
         operator: Token = advance(parser)
         right: Expr = parse_binop(parser, precedence(peek(parser)) + 1)
@@ -469,7 +470,10 @@ def precedence(tok: Token) -> int:
         TKind.SLASH: 50,
         TKind.LPAR: 55,
         TKind.LESS: 40,
-        TKind.GREATER: 40
+        TKind.LESS_EQUAL: 40,
+        TKind.GREATER: 40,
+        TKind.GREATER_EQUAL: 40,
+        TKind.EQUAL_EQUAL: 40
     }
 
     return table.get(tok.kind, 0)

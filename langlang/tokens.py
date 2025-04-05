@@ -27,9 +27,12 @@ class TKind(Enum):
     SLASH   = auto(), # /
     MOD     = auto(), # %
 
-    EQUAL   = auto(), # =
-    LESS    = auto(), # =
-    GREATER = auto(), # =
+    EQUAL         = auto(), # "="
+    EQUAL_EQUAL   = auto(), # "=="
+    LESS          = auto(), # "<"
+    LESS_EQUAL    = auto(), # "<="
+    GREATER       = auto(), # ">"
+    GREATER_EQUAL = auto(), # ">="
 
     LPAR=auto(),   # "("
     RPAR=auto(),   # ")"
