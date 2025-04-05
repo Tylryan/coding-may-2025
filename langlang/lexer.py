@@ -31,6 +31,8 @@ class LexState:
         "while": TKind.WHILE,
         "break": TKind.BREAK,
         "null" : TKind.NULL,
+        "true" : TKind.TRUE,
+        "false" : TKind.FALSE,
         "print": TKind.PRINT
     }
 
@@ -52,6 +54,7 @@ def lex(source: str):
         elif "<" == char: push(lexer, Token(TKind.LESS, char, None)); consume(lexer)
         elif ";" == char: push(lexer, Token(TKind.SEMI, char, None)); consume(lexer)
         elif "," == char: push(lexer, Token(TKind.COMMA, char, None)); consume(lexer)
+        elif "." == char: push(lexer, Token(TKind.DOT, char, None)); consume(lexer)
         # TODO(tyler): Eventually this will extend to `--`.
         elif "-" == char: push(lexer, Token(TKind.MINUS, char, None)); consume(lexer)
         elif char in ["\n", "\r"]: lexer.line+=1; consume(lexer)
@@ -140,7 +143,15 @@ def number(lexer: LexState) -> Token:
     while at_end(lexer) is False and peek(lexer).isdigit():
         str_number += consume(lexer)
 
-    return Token(TKind.INT, str_number, int(str_number))
+    if peek(lexer) != ".":
+        return Token(TKind.INT, str_number, int(str_number))
+
+    str_number += consume(lexer)
+
+    while at_end(lexer) is False and peek(lexer).isdigit():
+        str_number += consume(lexer)
+
+    return Token(TKind.FLOAT, str_number, float(str_number))
 
 
 

@@ -95,6 +95,9 @@ def interp_expr(interp: Interpreter, expr: Expr) -> Expr:
         if isinstance(expr, FunCall) : return eval_funcall(interp, expr)
         if isinstance(expr, Return)  : return eval_return(interp, expr)
         if isinstance(expr, Null)    : return expr
+        if isinstance(expr, Tru)     : return expr
+        if isinstance(expr, Fals)    : return expr
+        if isinstance(expr, Str)     : return expr
         if isinstance(expr, Variable): return expr
         if isinstance(expr, ConstInt): return expr
         if isinstance(expr, Break)   : return expr
@@ -231,20 +234,27 @@ def eval_bin_op(interp: Interpreter, expr: BinOp) -> Expr:
 
     operator: Token = expr.op
 
-    if operator.kind == TKind.PLUS:
-        return MK_CONST_INT(CONT_INT_AS_INT(left) + CONT_INT_AS_INT(right))
-    if operator.kind == TKind.MINUS:
-        return MK_CONST_INT(CONT_INT_AS_INT(left) - CONT_INT_AS_INT(right))
-    elif operator.kind == TKind.STAR:
-        return MK_CONST_INT(CONT_INT_AS_INT(left) * CONT_INT_AS_INT(right))
-    elif operator.kind == TKind.GREATER:
-        return MK_BOOL_EXPR(CONT_INT_AS_INT(left) > CONT_INT_AS_INT(right))
-    elif operator.kind == TKind.LESS:
-        return MK_BOOL_EXPR(CONT_INT_AS_INT(left) < CONT_INT_AS_INT(right))
-    else:
-        from errors import perror
-        perror(f"[interpreter-error] unimplemented operator on line [TODO]: `{operator.lexeme}`")
+    if isinstance(left, ConstInt):
+        if operator.kind == TKind.PLUS:
+            return MK_CONST_INT(CONT_INT_AS_INT(left) + CONT_INT_AS_INT(right))
+        if operator.kind == TKind.MINUS:
+            return MK_CONST_INT(CONT_INT_AS_INT(left) - CONT_INT_AS_INT(right))
+        elif operator.kind == TKind.STAR:
+            return MK_CONST_INT(CONT_INT_AS_INT(left) * CONT_INT_AS_INT(right))
+        elif operator.kind == TKind.GREATER:
+            return MK_BOOL_EXPR(CONT_INT_AS_INT(left) > CONT_INT_AS_INT(right))
+        elif operator.kind == TKind.LESS:
+            return MK_BOOL_EXPR(CONT_INT_AS_INT(left) < CONT_INT_AS_INT(right))
+        else:
+            from errors import perror
+            perror(f"[interpreter-error] unimplemented operator on line [TODO]: `{operator.lexeme}`")
 
+    if isinstance(left, Str):
+        if operator.kind == TKind.PLUS:
+            return MK_STR_EXPR(STR_AS_STR(left) + STR_AS_STR(right))
+        else:
+            from errors import perror
+            perror(f"[interpreter-error] unimplemented operator on line [TODO]: `{operator.lexeme}`")
 
 
 def checks(classname, *exprs: Expr) -> bool: 

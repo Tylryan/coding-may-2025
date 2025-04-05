@@ -4,7 +4,7 @@ from pprint import pprint
 import sys
 
 from lexer import lex, Token, TKind, perror
-from tokens import Token, TKind, MK_INT, MK_NULL_TOK
+from tokens import Token, TKind, MK_INT, MK_NULL_TOK, MK_STR_TOK
 from errors import perror
 
 class Expr:
@@ -57,17 +57,28 @@ class Parser:
 class Null(Expr):
     token: Token
 
+    def __repr__(self):
+        return "null"
+
 @dataclass
 class Tru(Expr):
-    pass
+    def __repr__(self):
+        return "true"
+
+@dataclass
+class Fals(Expr):
+    def __repr__(self):
+        return "false"
+
+@dataclass
+class Str(Expr):
+    tok: Token
+    def __repr__(self):
+        return f'"{self.tok.lexeme}"'
 
 @dataclass
 class Break(Expr):
     token: Token
-
-@dataclass
-class Fals(Expr):
-    pass
 
 @dataclass
 class Variable(Expr):
@@ -112,6 +123,8 @@ class FunCall(Expr):
 @dataclass
 class ConstInt(Expr):
     tok: Token
+    def __repr__(self):
+        return self.tok.lexeme
 
 @dataclass
 class Group(Expr):
@@ -124,11 +137,17 @@ def MK_NULL_EXPR() -> Expr:
 def MK_CONST_INT(number: int):
     return ConstInt(MK_INT(number))
 
+def MK_STR_EXPR(string: str):
+    return Str(MK_STR_TOK(string))
+
 def MK_BOOL_EXPR(boolean: bool):
     return Tru() if boolean else Fals()
 
 def CONT_INT_AS_INT(ci: ConstInt) -> int:
     return ci.tok.value
+
+def STR_AS_STR(string: Str) -> str:
+    return string.tok.value
 
 def parse(tokens: list[Token]):
 
@@ -366,7 +385,7 @@ def parse_funcall(parser: Parser, min_prec: int) -> Expr:
     # IDENT ("(" ARGS? ")")+
     # ARGS = ARG ("," ARG)*
 
-    expr: Expr = parse_int(parser)
+    expr: Expr = parse_primary(parser)
 
     if check(parser, TKind.LPAR) is False:
         return expr
@@ -402,10 +421,10 @@ def parse_funcall(parser: Parser, min_prec: int) -> Expr:
 
 
 
-def parse_int(parser: Parser) -> Expr:
+def parse_primary(parser: Parser) -> Expr:
     tok: Token = peek(parser)
     expr: Expr = MK_NULL_EXPR()
-    if check(parser, TKind.INT):
+    if check(parser, TKind.INT, TKind.FLOAT):
         expr = ConstInt(tok)
     elif check(parser, TKind.IDENT):
         expr = Variable(tok)
@@ -414,6 +433,14 @@ def parse_int(parser: Parser) -> Expr:
         # Skips "break", next advance below
         # will skip semicolon
         advance(parser)
+    elif check(parser, TKind.TRUE):
+        expr = Tru()
+    elif check(parser, TKind.FALSE):
+        expr = Fals()
+    elif check(parser, TKind.STR):
+        expr = Str(tok)
+    elif check(parser, TKind.NULL):
+        expr = Null(tok)
     else:
         perror(f"[parse-error] unimplemented token: {tok}")
 
@@ -526,8 +553,3 @@ if __name__ == "__main__":
 
     print_title("BEGIN PARSING")
     pprint(parse(tokens))
-
-
-
-
-

@@ -3,13 +3,16 @@ from enum import StrEnum, Enum, auto
 
 class TKind(Enum):
     INT=auto(),     # \d+
+    FLOAT=auto(),   # \d+\.\d+
     STR=auto(),     # "..."
     IDENT=auto(),   # [a-zA-Z_][a-zA-Z_]*
+    TRUE=auto(),    # "true"
+    FALSE=auto(),   # "false"
+    NULL=auto(),    # "null"
 
     VAR=auto(),     # "var"
     FUN=auto(),     # "fun"
     RETURN=auto(),  # "return"
-    NULL=auto(),    # "null"
     PRINT=auto(),   # "print"
 
     IF=auto(),      # "if"
@@ -34,6 +37,7 @@ class TKind(Enum):
     RBRACE=auto(), # "}"
     SEMI=auto(),   # ";"
     COMMA=auto(),  # ","
+    DOT=auto(),  # "."
 
 
     EOF =auto()
@@ -50,3 +54,6 @@ def MK_INT(number: int):
 
 def MK_NULL_TOK() -> Token:
     return Token(TKind.NULL, "null", None)
+
+def MK_STR_TOK(string: str):
+    return Token(TKind.STR, str(string), string)
