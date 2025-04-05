@@ -5,61 +5,42 @@ from pprint import pprint
 
 @dataclass 
 class Environment:
-    scope: list[dict[str, Expr]]
+    scope: dict[str, Expr]
     
-    def __init__(self):
-        self.scope = [{}]
-
-    def push(self):
-        self.scope.append({})
-
-    def pop(self) -> dict[str, Expr]:
-        # Do not pop global scope
-        assert len(self.scope) != 1
-        return self.scope.pop()
+    def __init__(self, parent = None):
+        self.scope = {}
+        # this is Environment
+        self.parent = parent
 
     def define(self, var_name: str, value: Expr):
-        # I'm allowing redeclarations in global scope as
-        # there was an issue with declaring parameters of
-        # two different functions with the same name.
-        # E.g.
-        # fun one(number) {}
-        # fun two(number) {} // Would be considered redeclaring `number` in the same scope.
-        only_globals = len(self.scope) == 1
-        if self.get_index(var_name) == -1 and not only_globals:
-            perror(f"[interpreter-error] cannot redeclare variable `{var_name}` in the same scope.")
-        self.scope[-1][var_name] = value
+        self.scope[var_name] = value
 
     def assign(self, var_name: str, expr: Expr):
-        scope_index = self.get_index(var_name)
-        if scope_index > 0:
-            perror(f"[interpreter-error] cannot assign value to undeclared variable: `{var_name}`")
-        self.scope[scope_index][var_name] = expr
+        if var_name in self.scope:
+            self.scope[var_name] = expr
+        
+        cop = self.parent
+        while cop:
+            if var_name in cop.scope:
+                cop.scope[var_name] = expr
+            cop = self.parent.parent
 
     def get(self, var_name: str) -> Expr | None:
-        if self.exists(var_name) is False:
-            return None
+        if var_name in self.scope:
+            return self.scope[var_name]
         
-        index = self.get_index(var_name)
-        return self.scope[index][var_name]
+        cop = self.parent
+        while cop:
+            if var_name in cop.scope:
+                return cop.scope[var_name]
+            cop = self.parent.parent
+            
+        return None
 
     def exists(self, var_name: str) -> bool:
-        return True if self.get_index(var_name) <= 0 else False
-
-    # If in index, result will be <= 0
-    # if not in any scope, result will be > 0
-    def get_index(self, var_name) -> int:
-        i = -1
-        while not var_name in self.scope[i]:
-            if abs(i) >= len(self.scope):
-                return 1
-            i-=1
-
-        return i
-
-
-
-
+        if self.get(var_name) is None:
+            return False
+        return True
 
 @dataclass
 class Interpreter:
@@ -107,39 +88,11 @@ def eval_return(interp: Interpreter, expr: Return) -> Expr:
     return expr
 
 def eval_funcall(interp: Interpreter, expr: FunCall) -> Expr:
-    # Does function exist?
-    fun_name: str = expr.name.token.lexeme
-    lfun: LoxFun | None = interp.environ.get(fun_name)
-
-    if not lfun:
-        perror(f"[interpreter-error] attempting to call undefined function: `{fun_name}`")
-
-    # Does the arity match?
-    dec_arity = lfun.fun.arity
-    call_arity = expr.arity
-    
-    if call_arity > dec_arity:
-        perror(f"[interpreter-error] function called with too many arguments. expected {dec_arity}, but found {call_arity} in `{fun_name}`")
-    elif call_arity < dec_arity:
-        perror(f"[interpreter-error] function called with too few arguments. expected {dec_arity}, but found {call_arity} in `{fun_name}`")
-
-    for i, param in enumerate(lfun.fun.params):
-        arg = interp_expr(interp, expr.args[i])
-        interp.environ.define(param.lexeme, arg)
-
-
-    res = eval_block(interp, lfun.fun.body)
-    if isinstance(res, Return):
-        return interp_expr(interp, res.expr)
-    else:
-        return res
+    pass
 
 
 def eval_fundec(interp: Interpreter, expr: Fun) -> Expr:
-    name_tok: Token = expr.name
-    closure: Environment = interp.environ
-    interp.environ.define(name_tok.lexeme, LoxFun(expr, closure))
-    return MK_NULL_EXPR()
+    pass
 
 def eval_while(interp: Interpreter, expr: While) -> Expr:
     res = MK_NULL_EXPR()
@@ -167,7 +120,9 @@ def eval_if(interp: Interpreter, expr: If) -> Expr:
 
 # Returns the last evaluated expression
 def eval_block(interp: Interpreter, expr: Block) -> Expr:
-    interp.environ.push()
+    old_env = interp.environ
+    interp.environ = Environment(old_env)
+
     last_expr: Expr = MK_NULL_EXPR()
     for e in expr.exprs:
         expression = interp_expr(interp, e)
@@ -177,8 +132,8 @@ def eval_block(interp: Interpreter, expr: Block) -> Expr:
             last_expr = expression
             break
         last_expr = expression
-    interp.environ.pop()
 
+    interp.environ = old_env
     return last_expr
 
 def eval_print(interp: Interpreter, expr: Print) -> Expr:
@@ -198,7 +153,6 @@ def eval_assign(interp: Interpreter, expr: Assign) -> Expr:
     if interp.environ.exists(name) is False:
         perror(f"[interpreter-error] trying to assign value to undeclared variable: `{name}`")
 
-    scope_index = interp.environ.get_index(name)
     value: Expr = interp_expr(interp, expr.value)
     interp.environ.assign(name, value)
 

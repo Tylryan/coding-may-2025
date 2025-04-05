@@ -1,0 +1,8 @@
+
+/* TODO(tyler): This does not return the correct output. */
+fun fib(number) {
+    if (number <= 1) { return number; }
+    return fib(number - 1) + fib(number - 2);
+}
+
+print fib(5);            /* incorrectly produces 4 */
