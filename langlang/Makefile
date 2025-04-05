@@ -24,8 +24,9 @@ WHILE_BREAK=tests/05-while-break.txt
 FUN=tests/06-functions.txt
 FUN_PARAMS=tests/06-fun-params.txt
 FUN_RETURN=tests/06-fun-return.txt
+FUN_FIB=tests/06-fun-fib.txt
 MORE_TYPES=tests/07-more-types.txt
-FILE?=$(MORE_TYPES)
+FILE?=$(FUN_FIB)
 
 
 i:
