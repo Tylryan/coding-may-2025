@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -10,17 +11,33 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-        try {
-            return expression();
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()){
+            statements.add(statement());
         }
-        catch (ParseError error) {
-            return null;
-        }
+        return statements;
     }
 
     private Expr expression() {
         return equality();
+    }
+
+    private Stmt statement(){
+        if (match(TokenType.PRINT))
+            return printStatement();
+        return expressionStatement();
+    }
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(TokenType.SEMICOLON, "Expect ';' after print statement");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement(){
+        Expr expr = expression();
+        consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
     }
 
     private Expr equality() {
