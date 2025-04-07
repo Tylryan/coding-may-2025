@@ -2,6 +2,8 @@ import java.util.List;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
+    private Environment environment = new Environment();
+
     public Object evaluate(Expr expr) {
         return expr.accept(this);
     }
@@ -19,6 +21,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         }
     }
 
+
+    // Variable Declarations
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+        }
+
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
 
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
@@ -68,6 +83,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
         // Unreachable
         return null;
+    }
+
+    // Variable References
+    @Override
+    public Object visitVariableExpr(Expr.Variable expr) {
+        return environment.get(expr.name);
     }
 
     @Override
