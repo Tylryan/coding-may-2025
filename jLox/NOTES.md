@@ -21,6 +21,7 @@ Each level should call the one higher to keep the parsing machine
 from halting at any given level.
 - expression()
 - assignment()
+- logical()
 - equality()
 - comparison()
 - term()
@@ -31,7 +32,9 @@ from halting at any given level.
 ```
 expression ::= equality;
 assignment ::= IDENT "=" assignment
-             | equality ;
+             | logic_or ;
+logic_or   ::= logic_and ( "or" logic_and )* ;
+logic_and  ::= equality ( "and" equality )* ;
 equality   ::= comparison ( ( "!=" | "==") comparison)* ;
 comparison ::= term ( ( ">" | ">=" | "<" | "<=" ) term)* ;
 term       ::= factor ( ("-" | "+" ) factor )* ;

@@ -9,17 +9,11 @@ print a;
 {
     var a = "hi";
     print a;
-    // NOTE(tyler): This does NOT affect the outer
-    // `a` (i.e. "hello")
+    // NOTE(tyler): This does NOT affect the outer `a` (i.e. "hello")
     a = "world";
-    print a;
+    print a; // "world"
 }
 print a; // "hello"
 
 
-var b = 1;
-{
- var b = b + 1;
- print b;
-}
-print b;
+print nil or nil or "hello world";

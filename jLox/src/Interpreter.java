@@ -21,11 +21,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         }
     }
 
+    @Override
+    public Object visitIfStmt(Stmt.If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
+        }
+        return null;
+    }
 
     public Void visitBlockStmt(Stmt.Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
         return null;
     }
+
+
     void executeBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this.environment;
 
@@ -63,6 +74,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
         return null;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Expr.Logical expr) {
+        Object left = evaluate(expr.left);
+
+        if (expr.operator.type == TokenType.OR) {
+            if (isTruthy(left))
+                return left;
+        } else {
+            if (!isTruthy(left))
+                return left;
+        }
+
+        return evaluate(expr.right);
     }
 
     @Override

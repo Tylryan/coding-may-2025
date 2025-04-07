@@ -1,6 +1,7 @@
 abstract public class Expr {
     abstract <R> R accept(Visitor<R> visitor);
     interface Visitor<R> {
+        R visitLogicalExpr(Logical expr);
         R visitAssignExpr(Assign expr);
         R visitBinaryExpr(Binary expr);
         R visitGroupingExpr(Grouping expr);
@@ -9,6 +10,21 @@ abstract public class Expr {
         R visitVariableExpr(Variable expr);
     }
 
+    static class Logical extends Expr {
+        final Expr left;
+        final Token operator;
+        final Expr right;
+
+        Logical(Expr left, Token operator, Expr right) {
+            this.left     = left;
+            this.operator = operator;
+            this.right    = right;
+        }
+
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitLogicalExpr(this);
+        }
+    }
     static class Assign extends Expr {
         final Token name;
         final Expr value;
