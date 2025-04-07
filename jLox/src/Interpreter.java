@@ -85,6 +85,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
+    }
+
     // Variable References
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {

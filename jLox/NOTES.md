@@ -20,6 +20,7 @@ what you might expect.
 Each level should call the one higher to keep the parsing machine
 from halting at any given level.
 - expression()
+- assignment()
 - equality()
 - comparison()
 - term()
@@ -29,14 +30,16 @@ from halting at any given level.
 ## Grammar
 ```
 expression ::= equality;
-equality   ::= comparison ( ( "!=" | "==") comparison)*;
-comparison ::= term ( ( ">" | ">=" | "<" | "<=" ) term)*;
-term       ::= factor ( ("-" | "+" ) factor )*;
-factor     ::= unary ( ("/" | "*" ) unary )*;
+assignment ::= IDENT "=" assignment
+             | equality ;
+equality   ::= comparison ( ( "!=" | "==") comparison)* ;
+comparison ::= term ( ( ">" | ">=" | "<" | "<=" ) term)* ;
+term       ::= factor ( ("-" | "+" ) factor )* ;
+factor     ::= unary ( ("/" | "*" ) unary )* ;
 unary      ::= ("/" | "*" ) unary
-             | primary;
+             | primary ;
 primary    ::= NUMBER | STRING | "true" | "false" | "nil"
-             | "(" expression ")";
+             | "(" expression ")" ;
 ```
 ## Gotchas
 First, each rule needs to match expression at that precedence level or HIGHER.

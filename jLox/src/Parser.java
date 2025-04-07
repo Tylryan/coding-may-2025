@@ -20,7 +20,38 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    // NOTE(tyler): Pretty sure I do this wrong. Need to make sure
+    // to do it right in the future.
+    private Expr assignment() {
+        //assignment ::= IDENT "=" assignment
+        //             | equality ;
+
+        // Parse the l-value (a storage location that you
+        // can assign to).
+        Expr expr = equality();
+
+        // If equal sign
+        if (match(TokenType.EQUAL)) {
+            Token equals = previous();
+            // Since assignment is right associative, we recursively
+            // call itself here.
+            Expr value  = assignment();
+
+            // And if the l-value is a known l-value such
+            // as a variable, then assign a value to it.
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            // Can't assign to something that isn't an l-value
+            error(equals, "Invalid assignment target");
+        }
+
+        return expr;
     }
 
     private Stmt statement(){
