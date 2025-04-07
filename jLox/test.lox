@@ -16,4 +16,6 @@ print a;
 print a; // "hello"
 
 
-print nil or nil or "hello world";
+if (a == "hello") {
+    print "TRUE";
+}
