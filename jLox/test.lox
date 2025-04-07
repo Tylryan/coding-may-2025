@@ -16,6 +16,8 @@ print a;
 print a; // "hello"
 
 
-if (a == "hello") {
-    print "TRUE";
+var b = 0;
+while (b < 10) {
+    print b;
+    b = b + 1;
 }

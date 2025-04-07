@@ -33,6 +33,7 @@ public class Environment {
         // recursively.
         if (enclosing != null) {
             enclosing.assign(name, value);
+            return;
         }
 
         // If the variable was not found in any scopes,
