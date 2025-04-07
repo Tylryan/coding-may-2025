@@ -1,23 +1,8 @@
-// Currently, there is an aspect to this language that I don't like.
-// If in a sub scope, I should be able to modify the value of a variable
-// in a parent scope.
-//
-// Below, `a = "world"` should, IMO, reassign the outer `a` ("hello") to
-// hold the new value "world". Perhaps this will be fixed later.
-var a = "hello";
-print a;
-{
-    var a = "hi";
-    print a;
-    // NOTE(tyler): This does NOT affect the outer `a` (i.e. "hello")
-    a = "world";
-    print a; // "world"
-}
-print a; // "hello"
 
 
-var b = 0;
-while (b < 10) {
-    print b;
-    b = b + 1;
+fun sayHi(first, last) {
+    print "HI, " + first + " " + last;
 }
+
+
+sayHi("Tyler", "Ryan");

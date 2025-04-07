@@ -1,8 +1,10 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
+    Environment globals = new Environment();
+    private Environment environment = globals;
 
-    private Environment environment = new Environment();
 
     public Object evaluate(Expr expr) {
         return expr.accept(this);
@@ -27,6 +29,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
             execute(stmt.body);
         }
 
+        return null;
+    }
+
+    @Override
+    public Object visitFunctionStmt(Stmt.Function stmt) {
+        LoxFunction function = new LoxFunction(stmt);
+        environment.define(stmt.name.lexeme, function);
         return null;
     }
 
@@ -83,6 +92,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
         return null;
+    }
+
+
+    @Override
+    public Object visitCallExpr(Expr.Call expr) {
+        Object callee = evaluate(expr.callee);
+
+        List<Object> arguments = new ArrayList<>();
+        for (Expr argument : expr.arguments) {
+            arguments.add(evaluate(argument));
+        }
+
+        if (!(callee instanceof LoxCallable)){
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+
+        LoxCallable function = (LoxCallable) callee;
+
+        return function.call(this, arguments);
     }
 
     @Override
