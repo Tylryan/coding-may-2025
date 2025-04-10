@@ -1,23 +1,18 @@
 // Classes
-class Cake {
-    init(adjective) {
-        print "INITIALIZING CAKE";
-        this.adjective = adjective;
-    }
-    taste() {
-        print "The " + this.flavor + " cake is " + this.adjective + "!";
+class Doughnut {
+    cook() {
+        print "fry until golden brown";
     }
 }
 
-var cake = Cake("amazing");
-cake.flavor = "German Chocolate";
-cake.taste();
+class BostonCream < Doughnut {
+    cook() {
+        super.cook();
+        print "pipe full of custard and coat with chocolate";
+    }
+}
 
-var fp = cake.taste;
-fp();
-
-cake.flavor = "Vanilla";
-fp();
+BostonCream().cook();
 
 // Recursion
 fun fib(n) {
