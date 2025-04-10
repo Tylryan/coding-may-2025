@@ -6,8 +6,12 @@ class Person {
 }
 
 var p = Person();
+p.name = "Tyler";
 print Person;
 print p;
+print p.name;
+p.speak();
+
 
 // Recursion
 fun fib(n) {
