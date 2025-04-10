@@ -1,17 +1,20 @@
 // Classes
-class Person {
-    speak() {
-        print "HELLO !";
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print "The " + this.flavor + " cake is " + adjective + "!";
     }
 }
 
-var p = Person();
-p.name = "Tyler";
-print Person;
-print p;
-print p.name;
-p.speak();
+var cake = Cake();
+cake.flavor = "German Chocolate";
+cake.taste();
 
+var fp = cake.taste;
+fp();
+
+cake.flavor = "Vanilla";
+fp();
 
 // Recursion
 fun fib(n) {

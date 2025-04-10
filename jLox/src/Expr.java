@@ -13,8 +13,20 @@ abstract public class Expr {
         R visitVariableExpr(Variable expr);
         R visitGetExpr(Get expr);
         R visitSetExpr(Set expr);
+        R visitThisExpr(This expr);
     }
 
+    static class This extends Expr {
+        final Token keyword;
+
+        This(Token keyword) {
+            this.keyword = keyword;
+        }
+
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitThisExpr(this);
+        }
+    }
     static class Set extends Expr {
         final Expr object;
         final Token name;

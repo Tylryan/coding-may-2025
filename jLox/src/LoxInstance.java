@@ -19,6 +19,9 @@ public class LoxInstance {
         }
 
         LoxFunction method = klass.findMethod(name.lexeme);
+        if (method != null) {
+            return method.bind(this);
+        }
         if (method != null)
             return method;
 
