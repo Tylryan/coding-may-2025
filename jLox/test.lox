@@ -1,3 +1,14 @@
+// Classes
+class Person {
+    speak() {
+        print "HELLO !";
+    }
+}
+
+var p = Person();
+print Person;
+print p;
+
 // Recursion
 fun fib(n) {
     if (n <= 1)
@@ -8,7 +19,7 @@ fun fib(n) {
 print fib(5);
 
 var i = 0;
-while (i < 20) {
+while (i < 10) {
     print fib(i);
     i = i + 1;
 }

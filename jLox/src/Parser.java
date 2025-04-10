@@ -122,6 +122,8 @@ public class Parser {
                 return varDeclaration();
             if (match(TokenType.FUN))
                 return function("function");
+            if (match(TokenType.CLASS))
+                return classDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -129,6 +131,18 @@ public class Parser {
         }
     }
 
+    private Stmt classDeclaration() {
+        Token name = consume(TokenType.IDENTIFIER, "Expect class name.");
+        consume(TokenType.LEFT_BRACE, "Expect '{' before class body");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+            methods.add(function("method"));
+        }
+
+        consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods);
+    }
     private Stmt.Function function(String kind) {
         Token name = consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
 
