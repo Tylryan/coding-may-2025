@@ -1,0 +1,11 @@
+// Comment
+1
+10.00
+true
+false
+nil
+"a long string"
+>=
+<=
+==
+!=

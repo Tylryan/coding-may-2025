@@ -1,5 +1,7 @@
 import sys
 
+from scanner import Scanner
+
 class LoxState:
     hadError        = False
     hadRuntimeError = False
@@ -54,6 +56,8 @@ def run(source: str) -> None:
 
     interpreter.interpret(statements)
 
+def serror(line: int, message: str) -> None:
+    report(line, "", message)
 
 def report(line: int, where: str, message: str) -> None:
     print(f"[line {line}] Error {where}: {message}", file = sys.stderr)

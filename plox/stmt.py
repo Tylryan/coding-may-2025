@@ -10,13 +10,10 @@ class Stmt:
 class Expression(Stmt):
     expression: Expr 
 
-
-
 @dataclass
 class Return(Stmt):
     keyword: Token 
     value: Expr 
-
 
 @dataclass
 class Function(Stmt):
