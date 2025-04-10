@@ -1,12 +1,18 @@
 import sys
 
-from scanner import Scanner
+from scanner import scan
+from parser import parse
+from stmt import *
+from expr import *
 
 class LoxState:
     hadError        = False
     hadRuntimeError = False
-    interpreter     = Interpreter()
+    # interpreter     = Interpreter()
 
+
+class LRuntimeError(RuntimeError):
+    pass
 
 def main():
     if len(sys.argv) > 1:
@@ -40,21 +46,19 @@ def runPrompt() -> None:
         LoxState.hadError = False
 
 def run(source: str) -> None:
-    scanner                = Scanner(source)
-    tokens: list[Token]    = scanner.scanTokens()
-    parser: Parser         = Parser(tokens)
-    statements: list[Stmt] = parser.parse()
+    tokens: list[Token]    = scan(source)
+    statements: list[Stmt] = parse(tokens)
 
     if LoxState.hadError:
         return
 
-    resolver: Resolver = new Resolver(interpreter)
-    resolver.resolve(statements)
+    # resolver: Resolver = new Resolver(interpreter)
+    # resolver.resolve(statements)
 
-    if LoxState.hadError:
-        return
+    # if LoxState.hadError:
+    #     return
 
-    interpreter.interpret(statements)
+    # interpreter.interpret(statements)
 
 def serror(line: int, message: str) -> None:
     report(line, "", message)
