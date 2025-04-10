@@ -1,8 +1,9 @@
 # 30 Coding Challenge
 Below are the goals that I would like to achieve in this 30 day period.
-- [] jLox implemented
+- [x] jLox implemented
 - [] pLox: Translate jLox into pLox using a simpler design pattern.
 - [] langlang: Be able to implement langlang on the spot.
+    - Pretty much Lox but more expressive
     - Everything is an expression
     - Implicit returns
 - [] cLox: Start
