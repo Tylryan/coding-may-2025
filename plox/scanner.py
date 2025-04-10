@@ -49,15 +49,15 @@ def scanToken(scanner: ScannerState):
     c: str = advance(scanner)
 
     if c == "(": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == ")": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == "{": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == "}": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == ",": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == ".": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == "-": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == "+": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == ";": addToken(scanner, TokenType.LEFT_PAREN)
-    elif c == "*": addToken(scanner, TokenType.LEFT_PAREN)
+    elif c == ")": addToken(scanner, TokenType.RIGHT_PAREN)
+    elif c == "{": addToken(scanner, TokenType.LEFT_BRACE)
+    elif c == "}": addToken(scanner, TokenType.RIGHT_BRACE)
+    elif c == ",": addToken(scanner, TokenType.COMMA)
+    elif c == ".": addToken(scanner, TokenType.DOT)
+    elif c == "-": addToken(scanner, TokenType.MINUS)
+    elif c == "+": addToken(scanner, TokenType.PLUS)
+    elif c == ";": addToken(scanner, TokenType.SEMICOLON)
+    elif c == "*": addToken(scanner, TokenType.STAR)
     elif c == "!": 
         tokenType = TokenType.BANG
         if matches(scanner, "="):
