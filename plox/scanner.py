@@ -7,7 +7,6 @@ class ScannerState:
 
     start: int
     current: int
-    line: int
 
     keywords: dict[str, TokenType] = {
         "and"   : TokenType.AND,
@@ -85,7 +84,7 @@ def scanToken(scanner: ScannerState):
                 advance(scanner)
         else:
             addToken(scanner, TokenType.SLASH)
-    elif c in [" ", "\r", "\n"]:
+    elif c in [" "]:
         pass
     elif c == "\n":
         scanner.line+=1
