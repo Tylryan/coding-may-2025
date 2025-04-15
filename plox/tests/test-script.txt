@@ -1,16 +1,8 @@
 
 
-class Person {
-
-    init(name) {
-        this.name = name;
-    }
-
-    hello() {
-        print "Hello " + this.name;
-    }
+var a = 10;
+if (a > 100 ){
+    print "a > 100";
+} else {
+    print "a <= 100";
 }
-
-
-
-Person("Tyler").hello();
