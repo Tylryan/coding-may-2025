@@ -137,6 +137,10 @@ def classDeclaration(parser: ParserState) -> Stmt:
     while not check(parser, TokenType.RIGHT_BRACE) and not isAtEnd(parser):
         methods.append(fun(parser, "method"))
 
+    consume(parser, TokenType.RIGHT_BRACE, "Expect '}' after class declaration")
+
+    return Class(name, methods, superclass)
+
 def fun(parser: ParserState, kind: str) -> Function:
     name: Token = consume(parser, TokenType.IDENTIFIER,
                           f"Expect {kind} name.")
@@ -148,7 +152,10 @@ def fun(parser: ParserState, kind: str) -> Function:
             tok: Token = consume(parser, TokenType.IDENTIFIER, "Expect parameter name.")
             parameters.append(tok)
             
-            if matches(TokenType.COMMA):
+            if matches(parser, TokenType.COMMA):
+                continue
+
+            if check(parser, TokenType.RIGHT_PAREN):
                 break
 
     consume(parser, TokenType.RIGHT_PAREN, "Expect ')' after parameters")
@@ -162,7 +169,7 @@ def varDeclaration(parser: ParserState) -> Stmt:
 
     initializer: Expr  = None
 
-    if matches(TokenType.EQUAL):
+    if matches(parser, TokenType.EQUAL):
         initializer = expression(parser)
 
     consume(parser, TokenType.SEMICOLON, "Expect ';' after variable declaration")
@@ -267,11 +274,14 @@ def call(parser: ParserState) -> Expr:
 def finishCall(parser: ParserState, callee: Expr) -> Expr:
     arguments: list[Expr] = []
 
-    if not check(TokenType.RIGHT_PAREN):
+    if not check(parser, TokenType.RIGHT_PAREN):
         while True:
             arguments.append(expression(parser))
             if matches(parser, TokenType.COMMA):
                 break
+            if check(parser, TokenType.RIGHT_PAREN):
+                break
+
     paren: Token = consume(parser, TokenType.RIGHT_PAREN,
                            "Expect ')' after arguments.")
 

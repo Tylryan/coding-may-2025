@@ -12,7 +12,13 @@ class LoxState:
 
 
 class LRuntimeError(RuntimeError):
-    pass
+
+    def __init__(self, token, message: str):
+        self.token = token
+        self.message = message
+
+    def getMessage(self):
+        return self.message
 
 def main():
     if len(sys.argv) > 1:
@@ -39,8 +45,8 @@ def runFile(path: str) -> None:
 
 def runPrompt() -> None:
     while True:
-        res = input("> ")
-        if not res:
+        line = input("> ")
+        if not line:
             break
         run(line)
         LoxState.hadError = False
@@ -75,6 +81,6 @@ def error(token: Token, message: str) -> None:
         report(token.line, f" at {token.lexeme}", message)
 
 
-def rumtimeError(error: LRuntimeError):
-    print(f"{error.getMessage()}\n[line {error.token.line}]")
+def runtimeError(error: LRuntimeError):
+    print(f"[line {error.token.line}] {error.message}")
     LoxState.hadRuntimeError = True

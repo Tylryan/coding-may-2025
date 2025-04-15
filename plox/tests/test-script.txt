@@ -1,10 +1,16 @@
-// Hell world
 
 
-var a = 10;
+class Person {
 
-if (a == 10) {
-    print "TRUE";
-} else {
-    print "FALSE";
+    init(name) {
+        this.name = name;
+    }
+
+    hello() {
+        print "Hello " + this.name;
+    }
 }
+
+
+
+Person("Tyler").hello();
