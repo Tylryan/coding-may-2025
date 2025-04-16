@@ -58,10 +58,45 @@ def evaluate(interp: Interp, stmt: Stmt) -> object:
         return eval_var_stmt(interp, stmt)
     elif isinstance(stmt, Expression):
         return eval_expr_stmt(interp, stmt)
+    elif isinstance(stmt, Return):
+        return eval_return_stmt(interp, stmt)
+    elif isinstance(stmt, Function):
+        return eval_fun_stmt(interp, stmt)
+    elif isinstance(stmt, Call):
+        return eval_call_expr(interp, stmt)
+    
     else:
         pprint(f"[interpreter-error] unimplemented expression:`{stmt}`")
         exit(1)
 
+
+def eval_call_expr(interp: Interp, expr: Call) -> object:
+    callee: object = evaluate(interp, expr.callee)
+
+    arguments: list[object] = []
+    for argument in expr.arguments:
+        arguments.append(evaluate(interp, argument))
+
+    if not isinstance(callee, LoxCallable):
+        print("[interpreter-error] Can only call functions.")
+        exit(1)
+
+    fun: LoxCallable = callee;
+    return fun.call(interp, arguments)
+
+def eval_fun_stmt(interp: Interp, stmt: Function) -> None:
+    fun: LoxFunction = LoxFunction(stmt, 
+                                   interp.environment,
+                                   False)
+    interp.environment.define(stmt.name.lexeme, fun)
+    return None
+
+def eval_return_stmt(interp: Interp, stmt: Return) -> None:
+    value: object = None
+    if stmt.value is not None:
+        value = evaluate(interp, stmt.value)
+
+    raise LoxReturn(value)
 
 def eval_while_stmt(interp: Interp, stmt: While) -> None:
     while isTruthy(evaluate(interp, stmt.condition)):

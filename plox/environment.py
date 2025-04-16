@@ -33,6 +33,6 @@ class Environment:
         if self.enclosing is not None:
             return self.enclosing.get(name)
 
-        print(f"[parser-error] undefined variable: `{name}`")
+        print(f"[environment-error] undefined variable: `{name}`")
         exit(1)
         
