@@ -10,6 +10,18 @@ class Interp:
     environment: Environment     = globals
     locals     : dict[Expr, int] = {}
 
+class LoxCallable:
+    def arity(self) -> int:
+        pass
+    def call(self, interp: Interp, arguments: list[object]) -> object:
+        pass
+
+
+class LoxReturn(RuntimeError):
+    value: object
+
+    def __init__(self, value: object):
+        self.value = value
 
 def interpret(stmts: list[Stmt]) -> None:
     interp = Interp()
@@ -179,6 +191,31 @@ def eval_literal(interp: Interp, expr: Literal) -> object:
     return expr.value
 
 
+# Functions
+@dataclass
+class LoxFunction(LoxCallable):
+    declaration  : Function
+    closure      : Environment
+    isInitializer: bool
+
+    def arity(self) -> int:
+        return len(self.declaration.params)
+
+    def call(self, interp: Interp, arguments: list[object]) -> object:
+        environment = Environment(self.closure)
+
+        for i, param in enumerate(self.declaration.params):
+            environment.define(self.declaration.params[i].lexeme,
+                               arguments[i])
+
+        try:
+            execute_block(interp, 
+                          self.declaration.body,
+                          environment)
+        except LoxReturn as rv:
+            return rv.value
+
+        return None
 
 # ------------- Helpers
 def stringify(obj: object) -> str:

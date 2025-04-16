@@ -53,8 +53,31 @@ def block(parser: ParseState) -> list[Stmt]:
 def declaration(parser: ParseState) -> Stmt:
     if matches(parser, TokenType.VAR):
         return varDeclaration(parser)
+    if matches(parser, TokenType.FUN):
+        return fun(parser)
     
     return statement(parser)
+
+def fun(parser: ParseState) -> Function:
+    name: Token = consume(parser, TokenType.IDENTIFIER,
+                          "Expect function name")
+    consume(parser, TokenType.LEFT_PAREN, "Expect '(' after function name")
+
+    parameters: list[Token] = []
+    if not check(parser, TokenType.RIGHT_PAREN):
+        parameters.append(consume(parser, TokenType.IDENTIFIER,
+                                  "Expect parameter name"))
+        
+        while matches(parser, TokenType.COMMA):
+            parameters.append(consume(parser, TokenType.IDENTIFIER,
+                                    "Expect parameter name"))
+
+
+    consume(parser, TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+    consume(parser, TokenType.LEFT_BRACE, "Expect '{' before function body.")
+
+    body: list[Stmt] = block(parser)
+    return Function(name, parameters, body)
 
 def varDeclaration(parser: ParseState) -> Stmt:
     name: Token = consume(parser, TokenType.IDENTIFIER, "Expect variable name.")
