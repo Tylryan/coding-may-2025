@@ -44,6 +44,8 @@ def evaluate(interp: Interp, stmt: Stmt) -> object:
         return eval_while_stmt(interp, stmt)
     elif isinstance(stmt, Var):
         return eval_var_stmt(interp, stmt)
+    elif isinstance(stmt, Expression):
+        return eval_expr_stmt(interp, stmt)
     else:
         pprint(f"[interpreter-error] unimplemented expression:`{stmt}`")
         exit(1)

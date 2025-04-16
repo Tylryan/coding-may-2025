@@ -12,9 +12,10 @@ class Environment:
     def define(self, name: str, value: object) -> None:
         self.values[name] = value
 
-    def assign(self, name: Token, value: object) -> bool:
-        if name.lexeme in self.values.keys():
-            self.values.update(name.lexeme, value)
+    def assign(self, name: str, value: object) -> bool:
+        assert isinstance(name, str)
+        if name in self.values.keys():
+            self.values[name] =  value
             return True
 
         if self.enclosing is not None:

@@ -182,7 +182,7 @@ def comparison(parser: ParseState) -> Expr:
 def term(parser: ParseState) -> Expr:
     expr: Expr = factor(parser)
 
-    while matches(parser, TokenType.STAR, TokenType.SLASH):
+    while matches(parser, TokenType.PLUS, TokenType.MINUS):
         operator: Token = previous(parser)
         right: Expr = factor(parser)
         expr = Binary(expr, operator, right)
@@ -230,7 +230,7 @@ def primary(parser: ParseState) -> Expr:
 def consume(parser, type: TokenType, message: str) -> Token:
     if check(parser, type):
         return advance(parser)
-    print(f"[parser-error] {str}")
+    print(f"[parser-error] {message}")
     exit(1)
 
 def matches(parser, *types: TokenType) -> bool:
