@@ -227,7 +227,31 @@ def unary(parser: ParseState) -> Expr:
         right: Expr = unary(parser)
         return Unary(operator, right)
 
-    return primary(parser)
+    return call(parser)
+
+def call(parser: ParseState) -> Expr:
+    expr: Expr = primary(parser)
+
+    def finishCall(parser: ParseState, callee: Expr) -> Expr:
+        arguments: list[Expr] = []
+
+        if not check(parser, TokenType.RIGHT_PAREN):
+            arguments.append(expression(parser))
+            while matches(parser, TokenType.COMMA):
+                arguments.append(expression(parser))
+
+        paren: Token = consume(parser, TokenType.RIGHT_PAREN,
+                               "Expect ')' after arguments.")
+        
+        return Call(callee, paren, arguments)
+
+    while True:
+        if matches(parser, TokenType.LEFT_PAREN):
+            expr = finishCall(parser, expr)
+        else:
+            break
+
+    return expr
 
 def primary(parser: ParseState) -> Expr:
     if matches(parser, TokenType.FALSE): return Literal(False)

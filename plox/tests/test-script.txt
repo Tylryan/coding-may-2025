@@ -2,4 +2,8 @@
 
 fun hello(name) {
     print "HELLO: " + name;
+    return nil;
 }
+
+
+hello("Tyler");
