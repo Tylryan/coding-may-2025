@@ -6,9 +6,14 @@ from stmt import *
 from tokens import Token, TokenType
 
 class Interp:
-    globals    : Environment     = Environment(None)
-    environment: Environment     = globals
-    locals     : dict[Expr, int] = {}
+    globals    : Environment
+    environment: Environment
+    locals     : dict[Expr, int]
+
+    def __init__(self):
+        self.globals = Environment(None)
+        self.environment = self.globals
+        self.locals = {}
 
 class LoxCallable:
     def arity(self) -> int:
@@ -205,7 +210,7 @@ def eval_binary(interp: Interp, expr: Binary) -> object:
         case TokenType.PLUS:
             if isinstance(left, float) and isinstance(right, float):
                 return float(left) + float(right)
-            if isinstance(left, str) and isinstance(right, str):
+            if isinstance(left, str) or isinstance(right, str):
                 return str(left) + str(right)
         case _:
             print(f"[interpreter-error] unknown token type for binary expressions: `{expr.operator.lexeme}`")
