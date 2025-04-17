@@ -11,65 +11,8 @@ abstract public class Expr {
         R visitLiteralExpr(Literal expr);
         R visitUnaryExpr(Unary expr);
         R visitVariableExpr(Variable expr);
-        R visitGetExpr(Get expr);
-        R visitSetExpr(Set expr);
-        R visitThisExpr(This expr);
-        R visitSuperExpr(Super expr);
     }
 
-    static class This extends Expr {
-        final Token keyword;
-
-        This(Token keyword) {
-            this.keyword = keyword;
-        }
-
-        <R> R accept(Visitor<R> visitor) {
-            return visitor.visitThisExpr(this);
-        }
-    }
-
-    static class Super extends Expr {
-        final Token keyword;
-        final Token method;
-
-        Super(Token keyword, Token method) {
-            this.keyword = keyword;
-            this.method  = method;
-        }
-        <R> R accept(Visitor<R> visitor) {
-            return visitor.visitSuperExpr(this);
-        }
-    }
-    static class Set extends Expr {
-        final Expr object;
-        final Token name;
-        final Expr value;
-
-        Set(Expr object, Token name, Expr value) {
-            this.object = object;
-            this.name = name;
-            this.value = value;
-        }
-
-        <R> R accept(Visitor<R> visitor) {
-            return visitor.visitSetExpr(this);
-        }
-    }
-
-    static class Get extends Expr {
-        final Expr object;
-        final Token name;
-
-        Get(Expr object, Token name) {
-            this.object = object;
-            this.name = name;
-        }
-
-        <R> R accept(Visitor<R> visitor) {
-            return visitor.visitGetExpr(this);
-        }
-    }
     static class Call extends Expr {
         final Expr callee;
         final Token paren;
