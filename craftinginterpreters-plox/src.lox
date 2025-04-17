@@ -1,0 +1,14 @@
+var language = "lox";
+var test =
+	1 == 2 ? "help" : "we cool, no help";
+
+
+"strings";
+print 123;
+123.1233; // sample, should write a real program.
+print 123+123;
+
+print "";
+print "These should be more different somehow... the # version should tell it lies.";
+1 == 1 ? "False" : "True";
+print 1 == 1 ? "False" : "True";
