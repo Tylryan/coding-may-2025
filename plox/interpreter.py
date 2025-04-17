@@ -8,12 +8,10 @@ from tokens import Token, TokenType
 class Interp:
     globals    : Environment
     environment: Environment
-    locals     : dict[Expr, int]
 
     def __init__(self):
-        self.globals = Environment(None)
-        self.environment = self.globals
-        self.locals = {}
+        self.environment = Environment(None)
+        self.globals     = self.environment
 
 class LoxCallable:
     def arity(self) -> int:
@@ -90,9 +88,7 @@ def eval_call_expr(interp: Interp, expr: Call) -> object:
     return fun.call(interp, arguments)
 
 def eval_fun_stmt(interp: Interp, stmt: Function) -> None:
-    fun: LoxFunction = LoxFunction(stmt, 
-                                   interp.environment,
-                                   False)
+    fun: LoxFunction = LoxFunction(stmt, interp.environment)
     interp.environment.define(stmt.name.lexeme, fun)
     return None
 
@@ -161,25 +157,13 @@ def eval_logical(interp: Interp, expr: Logical) -> object:
 
 def eval_assign(interp: Interp, expr: Assign) -> object:
     value: object = evaluate(interp, expr.value)
-
-    res = interp.environment.assign(expr.name.lexeme, value)
-
-    if res is False:
-        res = interp.globals.assign(expr.name.lexeme, value)
-
-    if res is False:
-        print(f"[interpreter-error] undefined variable: `{expr.name.lexeme}`")
-        exit(1)
-
+    interp.environment.assign(expr.name, value)
     return value
 
 def eval_variable(interp: Interp, expr: Variable) -> object:
     # Try to find in the environment stack
-    res = interp.environment.get(expr.name.lexeme)
-    if res: return res
+    return interp.environment.get(expr.name)
 
-    # If not in current, then search globals
-    return interp.globals.get(expr.name.lexeme)
 
 def eval_grouping(interp: Interp, expr: Grouping) -> object:
     return evaluate(interp, expr.expression)
@@ -236,7 +220,6 @@ def eval_literal(interp: Interp, expr: Literal) -> object:
 class LoxFunction(LoxCallable):
     declaration  : Function
     closure      : Environment
-    isInitializer: bool
 
     def arity(self) -> int:
         return len(self.declaration.params)
