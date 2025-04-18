@@ -18,6 +18,7 @@ Below are the goals that I would like to achieve in this 30 day period.
 - [ ] Implement langlang using langlang
 
 # Notes
-- 04-06-2024: I can't seem to figure out how to implement functions that can do a fibonacci sequence recursively. Since I'm pretty much using the ideas I've learned from reading crafting interpreters, I'll try to implement Jlox line for line. Hopefully I'll be able to wrap my mind around a working example in Java and be able to use it in LangLang.
+- 04-06-2025: I can't seem to figure out how to implement functions that can do a fibonacci sequence recursively. Since I'm pretty much using the ideas I've learned from reading crafting interpreters, I'll try to implement Jlox line for line. Hopefully I'll be able to wrap my mind around a working example in Java and be able to use it in LangLang.
 
-- 04-10-2024: jLox implemented. Going to start converting it to pLox.
+- 04-10-2025: jLox implemented. Going to start converting it to pLox.
+- 04-17-2025: I'm pretty sure I'm giving up on trying to convert jLox into pLox. Just going to try to find an already implemented pLox and learn from it.
