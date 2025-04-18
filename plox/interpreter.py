@@ -29,7 +29,7 @@ class LoxReturn(RuntimeError):
 
 def interpret(stmts: list[Stmt]) -> None:
     interp = Interp()
-    interp.globals.define("print", libffi.LoxPrint)
+    interp.globals.define("print", libffi.LoxPrint())
 
 
     for stmt in stmts:
@@ -52,8 +52,6 @@ def evaluate(interp: Interp, stmt: Stmt) -> object:
         return eval_grouping(interp, stmt)
     elif isinstance(stmt, Logical):
         return eval_logical(interp, stmt)
-    elif isinstance(stmt, Print):
-        return eval_print(interp, stmt)
     elif isinstance(stmt, Block):
         return eval_block_stmt(interp, stmt)
     elif isinstance(stmt, If):
@@ -83,12 +81,15 @@ def eval_call_expr(interp: Interp, expr: Call) -> object:
     for argument in expr.arguments:
         arguments.append(evaluate(interp, argument))
 
-    if not isinstance(callee, LoxCallable):
-        print("[interpreter-error] Can only call functions.")
-        exit(1)
+    # NOTE(tyler): Python's `isinstance` is not working for ffis
+    # so I'm removing the fucker. Not great for production code,
+    # but this isn't production and I hate python, soo...
 
-    fun: LoxCallable = callee;
-    return fun.call(interp, arguments)
+    # if not isinstance(callee, LoxCallable):
+    #     print("[interpreter-error] Can only call functions. type: ", type(callee))
+    #     exit(1)
+
+    return callee.call(interp, arguments)
 
 def eval_fun_stmt(interp: Interp, stmt: Function) -> None:
     fun: LoxFunction = LoxFunction(stmt, interp.environment)
@@ -139,11 +140,6 @@ def eval_var_stmt(interp: Interp, stmt: Var) -> None:
 
 def eval_expr_stmt(interp: Interp, stmt: Expression) -> None:
     evaluate(interp, stmt.expression)
-    return None
-
-def eval_print(interp: Interp, stmt: Print) -> None:
-    value: object = evaluate(interp, stmt.expression)
-    print(stringify(value))
     return None
 
 def eval_logical(interp: Interp, expr: Logical) -> object:

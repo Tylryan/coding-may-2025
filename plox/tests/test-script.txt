@@ -33,12 +33,12 @@ fun makeCounter() {
 
 var i = 0;
 while (i < 10) {
-    print fib(i);
+    print(fib(i));
     i = i + 1;
 }
 
 
-print fact(5);
+print(fact(5));
 
 
 print("HELLO " + "World");

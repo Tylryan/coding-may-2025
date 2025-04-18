@@ -25,8 +25,6 @@ def parse(tokens: list[Token]) -> list[Stmt]:
 
 # --------- Statements
 def statement(parser: ParseState) -> Stmt:
-    if matches(parser, TokenType.PRINT):
-        return printStatement(parser)
     if matches(parser, TokenType.LEFT_BRACE):
         return Block(block(parser))
 
@@ -121,11 +119,6 @@ def ifStatement(parser: ParseState) -> Expr:
     if matches(parser, TokenType.ELSE):
         elseBranch = statement(parser)
     return If(cond, thenBranch, elseBranch)
-
-def printStatement(parser: ParseState) -> Expr:
-    value: Expr = expression(parser)
-    consume(parser, TokenType.SEMICOLON, "Expect ';' after print statement.")
-    return Print(value)
 
 def expressionStatement(parser: ParseState) -> Expr:
     expr: Expr = expression(parser)

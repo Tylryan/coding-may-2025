@@ -1,15 +1,17 @@
 
 import interpreter
+from lox_callable import LoxCallable
 
 
 
-class LoxPrint(interpreter.LoxCallable):
+class LoxPrint(LoxCallable):
 
+    @property
     def arity(self) -> int:
         return 1
 
-    def call(interp: interpreter.Interp,
-             arguments: list[object]):
+    def call(self, interp: interpreter.Interp,
+             arguments: list[object]) -> object:
 
         for arg in arguments:
             print(arg, end = "")

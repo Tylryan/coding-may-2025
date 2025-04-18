@@ -42,7 +42,6 @@ class TokenType(StrEnum):
     NIL=auto(), 
     OR=auto(),
     
-    PRINT=auto(), 
     RETURN=auto(), 
     SUPER=auto(), 
     THIS=auto(), 

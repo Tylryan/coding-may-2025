@@ -17,7 +17,6 @@ class ScannerState:
         "fun"   : TokenType.FUN,
         "if"    : TokenType.IF,
         "or"    : TokenType.OR,
-        "print" : TokenType.PRINT,
         "return": TokenType.RETURN,
         "super" : TokenType.SUPER,
         "this"  : TokenType.THIS,
