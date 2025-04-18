@@ -5,13 +5,23 @@ import java.util.Map;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     Environment globals = new Environment();
-    private Environment environment = globals;
+    Environment environment = globals;
+    // this.locals contains AST nodes as the keys and the number
+    // of environments away where they are.
+    // { BinOp(Tok(+), Lit(1), Lit(2)) : 2 }
+    final Map<Expr, Integer> locals = new HashMap<>();
 
     public Object evaluate(Expr expr) {
         return expr.accept(this);
     }
     public void execute(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    // Literally just puts an expression and the hops away
+    // it currently is in a new hashmap.
+    public void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
     }
 
     void interpret(List<Stmt> statements) {
@@ -179,14 +189,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
-        environment.assign(expr.name, value);
+
+        Integer distance = locals.get(expr);
+        // If distance was found statically, use it.
+        if (distance != null){ environment.assignAt(distance, expr.name, value); }
+        // Else, dynamically assign the expression globally at runtime.
+        else { globals.assign(expr.name, value); }
+
+        // environment.assign(expr.name, value); OLD
         return value;
     }
 
     // Variable References
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return environment.get(expr.name);
+        //return environment.get(expr.name); OLD
+        return lookUpVariable(expr.name, expr);
     }
 
     @Override
@@ -215,6 +233,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     }
 
 
+    // ------------- HELPERS
+    private Object lookUpVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) { return environment.getAt(distance, name.lexeme); }
+        // If no distance, then must be a global. Look this value up dynamically.
+        // I.e. Dynamic Scoping for Global variables.
+        else                  { return globals.get(name); }
+    }
     private boolean isEqual(Object a, Object b) {
         if (a == null && b == null) return true;
         if (a == null) return false;

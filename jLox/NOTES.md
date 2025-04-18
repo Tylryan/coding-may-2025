@@ -203,10 +203,11 @@ all of the variables it contains."
 > runtime can be done in this way."
 
 
-When resolving variables, the following are the only interesting nodes:
-1. **Blocks Statements:** Introduces a new scope for the statement it contains.
-2. **Function Declarations:**
-3. **Variable Declarations:**
-4. **Variable Expressions:**
-   - Variable Assignment Expressions
+When resolving variables, we need to handle all of the nodes, but 
+the following are the only interesting nodes:
+1. **Blocks Statements:** Introduce a new scope for the statement it contains.
+2. **Function Declarations:**: Introduce a new scope for their body and bind their parameters in that scope.
+3. **Variable Declarations:**: Add a new variable to the current scope.
+4. **Variable Expressions:**: Need to have their variables resolved.
+   - Variable Assignment Expressions: Same as Variable Expressions.
 

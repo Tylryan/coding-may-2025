@@ -56,6 +56,11 @@ abstract public class Expr {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitAssignExpr(this);
         }
+
+        @Override
+        public String toString() {
+            return String.format("Assign(%s, %s)", name.lexeme, value);
+        }
     }
     static class Variable extends Expr {
         final Token name;
@@ -66,6 +71,11 @@ abstract public class Expr {
 
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitVariableExpr(this);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Variable(%s)", name.lexeme);
         }
     }
     static class Binary extends Expr {
@@ -84,9 +94,9 @@ abstract public class Expr {
         }
 
         public String toString() {
-            return String.format("Binary(%s, %s, %s)",
+            return String.format("Binary(%s, Token(%s), %s)",
                     left,
-                    operator,
+                    operator.lexeme,
                     right);
         }
     }
