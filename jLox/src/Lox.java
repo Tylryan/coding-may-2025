@@ -58,7 +58,9 @@ public class Lox {
 
         System.out.println("LOCALS");
         System.out.println(interpreter.locals);
-        System.exit(1);
+        //System.exit(1);
+        if (hadError)
+            return;
 
         interpreter.interpret(statements);
     }
