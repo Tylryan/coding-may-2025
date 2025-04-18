@@ -4,6 +4,7 @@ from environment import Environment
 from expr import *
 from stmt import *
 from tokens import Token, TokenType
+import libffi
 
 class Interp:
     globals    : Environment
@@ -28,6 +29,8 @@ class LoxReturn(RuntimeError):
 
 def interpret(stmts: list[Stmt]) -> None:
     interp = Interp()
+    interp.globals.define("print", libffi.LoxPrint)
+
 
     for stmt in stmts:
         evaluate(interp, stmt)
