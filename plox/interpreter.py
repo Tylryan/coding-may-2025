@@ -4,11 +4,14 @@ from environment import Environment
 from expr import *
 from stmt import *
 from tokens import Token, TokenType
+from resolver import resolveStatements, Resolver
 import libffi
 
 class Interp:
     globals    : Environment
     environment: Environment
+    # From resolver
+    locals     : dict[Expr, int]
 
     def __init__(self):
         self.environment = Environment(None)
@@ -31,6 +34,14 @@ def interpret(stmts: list[Stmt]) -> None:
     interp = Interp()
     interp.globals.define("print", libffi.LoxPrint())
 
+
+    resolver = Resolver()
+
+    resolveStatements(resolver, stmts)
+
+    interp.locals = resolver.resolutions.copy()
+    pprint(interp.locals)
+    exit(1)
 
     for stmt in stmts:
         evaluate(interp, stmt)
