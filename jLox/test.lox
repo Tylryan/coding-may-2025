@@ -3,4 +3,5 @@
 class Bagel {}
 
 var bagel = Bagel();
-print bagel;
+bagel.name = "Tyler";
+print bagel.name;
