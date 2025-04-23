@@ -49,4 +49,3 @@ class Print(Stmt):
 class Class(Stmt):
     name: Token 
     methods: list[Function]
-    superclass: Variable 

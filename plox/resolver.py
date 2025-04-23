@@ -53,6 +53,8 @@ def resolve(resolver: Resolver, stmt: Stmt | Expr) -> None:
         resolveWhileStmt(resolver, stmt)
     elif isinstance(stmt, Return):
         resolveReturnStmt(resolver, stmt)
+    elif isinstance(stmt, Class):
+        resolveClassStmt(resolver, stmt)
     else:
         print(f"[resolver-error] unimplemented expression: `{type(stmt)}`")
         exit(1)
@@ -121,6 +123,11 @@ def resolveAssignExpr(resolver: Resolver, expr: Assign) -> None:
     resolveLocal(resolver, expr, expr.name)
     return None
 
+def resolveClassStmt(resolver: Resolver, stmt: Function) -> None:
+    declare(resolver, stmt.name)
+    define(resolver, stmt.name)
+    return None
+    
 def resolveFunctionStmt(resolver: Resolver, stmt: Function) -> None:
     declare(resolver, stmt.name)
     define(resolver, stmt.name)

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Stack;
 
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
-    private final Interpreter interpreter;
+    final Interpreter interpreter;
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
 
@@ -32,7 +32,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     private void resolveLocal(Expr expr, Token name) {
         for (int i = scopes.size() - 1; i >= 0; i--){
-            boolean scope_contains_name = scopes.get(i).containsKey(name.lexeme);
+            boolean scope_contains_name = scopes.get(i)
+                    .containsKey(name.lexeme);
             if (scope_contains_name) {
                 // Push the key to interpreter's local hashmap
                 // and set the value to "how many hops away"
@@ -116,6 +117,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
 
     // -------------- Other Required Visitors
+    // New
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        declare(stmt.name);
+        define(stmt.name);
+        return null;
+    }
+
     @Override
     public Void visitCallExpr(Expr.Call expr) {
         resolve(expr.callee);

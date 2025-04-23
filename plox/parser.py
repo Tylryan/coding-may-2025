@@ -24,6 +24,16 @@ def parse(tokens: list[Token]) -> list[Stmt]:
 
 
 # --------- Statements
+def declaration(parser: ParseState) -> Stmt:
+    if matches(parser, TokenType.VAR):
+        return varDeclaration(parser)
+    if matches(parser, TokenType.FUN):
+        return fun(parser)
+    if matches(parser, TokenType.CLASS):
+        return classDeclaration(parser)
+    
+    return statement(parser)
+
 def statement(parser: ParseState) -> Stmt:
     if matches(parser, TokenType.LEFT_BRACE):
         return Block(block(parser))
@@ -48,13 +58,18 @@ def block(parser: ParseState) -> list[Stmt]:
     consume(parser, TokenType.RIGHT_BRACE, "Expect '}' after block.")
     return statements
 
-def declaration(parser: ParseState) -> Stmt:
-    if matches(parser, TokenType.VAR):
-        return varDeclaration(parser)
-    if matches(parser, TokenType.FUN):
-        return fun(parser)
-    
-    return statement(parser)
+
+def classDeclaration(parser: ParseState) -> Stmt:
+    name: Token = consume(parser, TokenType.IDENTIFIER, "Expect class name.")
+    consume(parser, TokenType.LEFT_BRACE, "Expect '{' before class body.")
+
+    methods: list[Function] = []
+
+    while (not check(parser, TokenType.RIGHT_BRACE)) and (not isAtEnd(parser)):
+        methods.append(fun(parser))
+
+    consume(parser, TokenType.RIGHT_BRACE, "Expect '}' after class body.")
+    return Class(name, methods)
 
 def fun(parser: ParseState) -> Function:
     name: Token = consume(parser, TokenType.IDENTIFIER,

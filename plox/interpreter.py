@@ -30,6 +30,13 @@ class LoxReturn(RuntimeError):
     def __init__(self, value: object):
         self.value = value
 
+@dataclass
+class LoxClass:
+    name: str
+
+    def __repr__(self):
+        return f"<class `{self.name}`>"
+
 def interpret(stmts: list[Stmt]) -> None:
     interp = Interp()
     interp.globals.define("print", libffi.LoxPrint())
@@ -78,11 +85,19 @@ def evaluate(interp: Interp, stmt: Stmt) -> object:
         return eval_fun_stmt(interp, stmt)
     elif isinstance(stmt, Call):
         return eval_call_expr(interp, stmt)
+    elif isinstance(stmt, Class):
+        return eval_class_stmt(interp, stmt)
     
     else:
         pprint(f"[interpreter-error] unimplemented expression:`{stmt}`")
         exit(1)
 
+
+def eval_class_stmt(interp: Interp, stmt: Class) -> object:
+    interp.environment.define(stmt.name.lexeme, None)
+    klass: LoxClass = LoxClass(stmt.name.lexeme)
+    interp.environment.assign(stmt.name, klass)
+    return None
 
 def eval_call_expr(interp: Interp, expr: Call) -> object:
     callee: object = evaluate(interp, expr.callee)
