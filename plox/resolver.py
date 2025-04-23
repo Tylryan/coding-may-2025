@@ -67,6 +67,7 @@ def resolveLocal(resolver: Resolver, expr: Expr, name: Token) -> None:
         if contains_name:
             hops = len(resolver.scopes) -1 - i
             resolver.resolutions[expr] = hops
+            return
 
         i-=1
 
@@ -92,6 +93,7 @@ def resolveStatements(resolver: Resolver, statements: list[Stmt]) -> None:
     for stmt in statements:
         resolve(resolver, stmt)
 
+
 def resolveVarStmt(resolver: Resolver, stmt: Var) -> None:
     declare(resolver, stmt.name)
     if stmt.initializer:
@@ -102,9 +104,15 @@ def resolveVarStmt(resolver: Resolver, stmt: Var) -> None:
 
 
 def resolveVariableExpr(resolver: Resolver, expr: Variable) -> None:
-    if resolver.scopes != [] and resolver.scopes[-1].get(expr.name.lexeme, False) == False:
+
+    idk = None
+    if len(resolver.scopes) > 0:
+        idk = resolver.scopes[-1].get(expr.name.lexeme)
+
+    if resolver.scopes != [] and idk == False:
         print(f"[resolver-error] Can't read local variable in it's own initializer: `{expr.name.lexeme}`.")
         exit(1)
+
     resolveLocal(resolver, expr, expr.name)
     return None
 

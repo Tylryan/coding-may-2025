@@ -41,7 +41,6 @@ def interpret(stmts: list[Stmt]) -> None:
 
     interp.locals = resolver.resolutions.copy()
     pprint(interp.locals)
-    exit(1)
 
     for stmt in stmts:
         evaluate(interp, stmt)
