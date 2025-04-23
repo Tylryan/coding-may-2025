@@ -1,7 +1,15 @@
 
+// At this point, classes are more like
+// structs I think.
 
-class Bagel {}
+class Person {
+    debug(person) {
+        print person.name + " is " + person.age + " years old.";
+    }
+}
 
-var bagel = Bagel();
-bagel.name = "Tyler";
-print bagel.name;
+var tyler  = Person();
+tyler.name = "Tyler";
+tyler.age  = "28";
+
+tyler.debug(tyler);
