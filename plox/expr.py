@@ -35,6 +35,9 @@ class Assign(Expr):
 class Variable(Expr):
     name: Token
 
+    def __repr__(self):
+        return f"Variable({self.name.lexeme})"
+
     def __hash__(self):
         return hash(f"__builtin_variable.{self.name.line}")
 
