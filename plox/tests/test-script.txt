@@ -1,17 +1,15 @@
 
 
-class Person {}
-
-fun person_dbg(person) {
-    print(person.name + " is " + person.age + " years old.");
+class Person {
+    debug(person) {
+        print(person.name + " is " + person.age + " years old.");
+    }
 }
+
 
 
 var tyler = Person();
 tyler.name = "Tyler";
 tyler.age = "28";
 
-
-
-
-person_dbg(tyler);
+tyler.debug(tyler);

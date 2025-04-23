@@ -6,6 +6,7 @@ from tokens import Token
 class FunctionType(Enum):
     NONE     = auto()
     FUNCTION = auto()
+    METHOD   = auto()
 
 class Resolver:
     scopes         : list[dict[str, bool]]
@@ -136,9 +137,13 @@ def resolveGetExpr(resolver: Resolver, expr: Get) -> None:
     resolve(resolver, expr.object)
     return None
 
-def resolveClassStmt(resolver: Resolver, stmt: Function) -> None:
+def resolveClassStmt(resolver: Resolver, stmt: Class) -> None:
     declare(resolver, stmt.name)
     define(resolver, stmt.name)
+
+    for method in stmt.methods:
+        declaration: FunctionType = FunctionType.METHOD
+        resolveFunction(resolver, method, declaration)
     return None
     
 def resolveFunctionStmt(resolver: Resolver, stmt: Function) -> None:

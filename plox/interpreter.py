@@ -47,6 +47,10 @@ class LoxInstance:
         if name.lexeme in self.fields:
             return self.fields.get(name.lexeme)
         
+        method: LoxFunction = self.klass.findMethod(name.lexeme)
+        if method: 
+            return method
+
         print(f"[interpreter-error] Undefined property `{name.lexeme}`")
         exit(1)
 
@@ -57,6 +61,7 @@ class LoxInstance:
 @dataclass
 class LoxClass(LoxCallable):
     name: str
+    methods: dict[str, LoxFunction]
 
     def __repr__(self):
         return f"<class `{self.name}`>"
@@ -67,6 +72,12 @@ class LoxClass(LoxCallable):
     def call(self, interp: Interp, arguments: list[object]) -> object:
         instance: LoxInstance = LoxInstance(self)
         return instance
+
+    def findMethod(self, name: str) -> LoxFunction:
+        if name in self.methods.keys():
+            return self.methods[name]
+
+        return None
 
 def interpret(stmts: list[Stmt]) -> None:
     interp = Interp()
@@ -148,7 +159,13 @@ def eval_get_expr(interp: Interp, stmt: Get) -> object:
 
 def eval_class_stmt(interp: Interp, stmt: Class) -> object:
     interp.environment.define(stmt.name.lexeme, None)
-    klass: LoxClass = LoxClass(stmt.name.lexeme)
+
+    methods: dict[str, LoxFunction] = {}
+    for method in stmt.methods:
+        fun: LoxFunction = LoxFunction(method, interp.environment)
+        methods[method.name.lexeme] = fun
+
+    klass: LoxClass = LoxClass(stmt.name.lexeme, methods)
     interp.environment.assign(stmt.name, klass)
     return None
 
