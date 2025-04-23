@@ -6,6 +6,17 @@ class Expr:
     pass
 
 @dataclass
+class Set(Expr):
+    object: object
+    name  : Token
+    value : Expr
+
+@dataclass
+class Get(Expr):
+    object: object
+    name  : Token
+
+@dataclass
 class Call(Expr):
     callee: Expr
     paren    : Token

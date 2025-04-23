@@ -34,12 +34,24 @@ class LoxReturn(RuntimeError):
 
 class LoxInstance:
     klass: LoxClass
+    fields: dict[str, object]
 
     def __init__(self, klass: LoxClass):
-        self.klass = klass
+        self.klass  = klass
+        self.fields = {}
 
     def __repr__(self):
         return f"<{self.klass.name} instance>"
+
+    def get(self, name: Token) -> object:
+        if name.lexeme in self.fields:
+            return self.fields.get(name.lexeme)
+        
+        print(f"[interpreter-error] Undefined property `{name.lexeme}`")
+        exit(1)
+
+    def set(self, name: Token, value: object) -> None:
+        self.fields[name.lexeme] = value
 
 
 @dataclass
@@ -106,11 +118,33 @@ def evaluate(interp: Interp, stmt: Stmt) -> object:
         return eval_call_expr(interp, stmt)
     elif isinstance(stmt, Class):
         return eval_class_stmt(interp, stmt)
+    elif isinstance(stmt, Get):
+        return eval_get_expr(interp, stmt)
+    elif isinstance(stmt, Set):
+        return eval_set_expr(interp, stmt)
     
     else:
         pprint(f"[interpreter-error] unimplemented expression:`{stmt}`")
         exit(1)
 
+
+def eval_set_expr(interp: Interp, stmt: Set) -> object:
+    object: object = evaluate(interp, stmt.object)
+    if not isinstance(object, LoxInstance):
+        print("[interpreter-error] Only instances have fields.")
+        exit(1)
+
+    value: object = evaluate(interp, stmt.value)
+    object.set(stmt.name, value)
+    return value
+
+def eval_get_expr(interp: Interp, stmt: Get) -> object:
+    object: object = evaluate(interp, stmt.object)
+    if isinstance(object, LoxInstance):
+        return object.get(stmt.name)
+
+    print(f"[interpreter-error] only instances have properties: `{object}`")
+    exit(1)
 
 def eval_class_stmt(interp: Interp, stmt: Class) -> object:
     interp.environment.define(stmt.name.lexeme, None)

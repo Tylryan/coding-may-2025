@@ -152,9 +152,13 @@ def assignment(parser: ParseState) -> Expr:
         # Right Associative
         value: Expr = assignment(parser)
 
+        # var a = value
         if isinstance(expr, Variable):
             name: Token = expr.name
             return Assign(name, value)
+        # class.field = value
+        elif isinstance(expr, Get):
+            return Set(expr.object, expr.name, value)
 
         print("[parser-error] invalid assignment target: `{expr}`")
         exit(1)
@@ -256,6 +260,10 @@ def call(parser: ParseState) -> Expr:
     while True:
         if matches(parser, TokenType.LEFT_PAREN):
             expr = finishCall(parser, expr)
+        elif matches(parser, TokenType.DOT):
+            name: Token = consume(parser, TokenType.IDENTIFIER,
+                                  "Expect property name after '.'.")
+            expr = Get(expr, name)
         else:
             break
 
