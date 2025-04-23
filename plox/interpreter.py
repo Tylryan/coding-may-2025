@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pprint import pprint
 
 from environment import Environment
@@ -30,12 +31,30 @@ class LoxReturn(RuntimeError):
     def __init__(self, value: object):
         self.value = value
 
+
+class LoxInstance:
+    klass: LoxClass
+
+    def __init__(self, klass: LoxClass):
+        self.klass = klass
+
+    def __repr__(self):
+        return f"<{self.klass.name} instance>"
+
+
 @dataclass
-class LoxClass:
+class LoxClass(LoxCallable):
     name: str
 
     def __repr__(self):
         return f"<class `{self.name}`>"
+
+    def arity(self) -> int:
+        return 0
+
+    def call(self, interp: Interp, arguments: list[object]) -> object:
+        instance: LoxInstance = LoxInstance(self)
+        return instance
 
 def interpret(stmts: list[Stmt]) -> None:
     interp = Interp()
