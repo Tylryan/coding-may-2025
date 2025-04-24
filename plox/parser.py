@@ -277,6 +277,9 @@ def primary(parser: ParseState) -> Expr:
     if matches(parser, TokenType.NUMBER, TokenType.STRING):
         return Literal(previous(parser).literal)
 
+    if matches(parser, TokenType.THIS):
+        return This(previous(parser))
+
     if matches(parser, TokenType.IDENTIFIER):
         return Variable(previous(parser))
 

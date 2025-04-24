@@ -49,7 +49,7 @@ class LoxInstance:
         
         method: LoxFunction = self.klass.findMethod(name.lexeme)
         if method: 
-            return method
+            return method.bind(self)
 
         print(f"[interpreter-error] Undefined property `{name.lexeme}`")
         exit(1)
@@ -133,6 +133,8 @@ def evaluate(interp: Interp, stmt: Stmt) -> object:
         return eval_get_expr(interp, stmt)
     elif isinstance(stmt, Set):
         return eval_set_expr(interp, stmt)
+    elif isinstance(stmt, This):
+        return eval_this_expr(interp, stmt)
     
     else:
         pprint(f"[interpreter-error] unimplemented expression:`{stmt}`")
@@ -168,6 +170,9 @@ def eval_class_stmt(interp: Interp, stmt: Class) -> object:
     klass: LoxClass = LoxClass(stmt.name.lexeme, methods)
     interp.environment.assign(stmt.name, klass)
     return None
+
+def eval_this_expr(interp: Interp, expr: This)  -> object:
+    return interp.environment.get(expr.keyword)
 
 def eval_call_expr(interp: Interp, expr: Call) -> object:
     callee: object = evaluate(interp, expr.callee)
@@ -334,7 +339,14 @@ class LoxFunction(LoxCallable):
 
         return None
 
+    def bind(self, instance: LoxInstance) -> LoxFunction:
+        environment: Environment = Environment(self.closure)
+        environment.define("this", instance)
+        return LoxFunction(self.declaration, environment)
+        
+
 # ------------- Helpers
+
 def stringify(obj: object) -> str:
     if obj is None:
         return "nil"

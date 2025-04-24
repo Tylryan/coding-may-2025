@@ -60,6 +60,8 @@ def resolve(resolver: Resolver, stmt: Stmt | Expr) -> None:
         resolveGetExpr(resolver, stmt)
     elif isinstance(stmt, Set):
         resolveSetExpr(resolver, stmt)
+    elif isinstance(stmt, This):
+        resolveThisExpr(resolver, stmt)
     else:
         print(f"[resolver-error] unimplemented expression: `{type(stmt)}`")
         exit(1)
@@ -141,10 +143,18 @@ def resolveClassStmt(resolver: Resolver, stmt: Class) -> None:
     declare(resolver, stmt.name)
     define(resolver, stmt.name)
 
+    beginScope(resolver)
+    resolver.scopes[-1]["this"] = True
+
     for method in stmt.methods:
         declaration: FunctionType = FunctionType.METHOD
         resolveFunction(resolver, method, declaration)
+
+    endScope(resolver)
     return None
+
+def resolveThisExpr(resolver: Resolver, expr: This) -> None:
+    resolveLocal(resolver, expr, expr.keyword)
     
 def resolveFunctionStmt(resolver: Resolver, stmt: Function) -> None:
     declare(resolver, stmt.name)

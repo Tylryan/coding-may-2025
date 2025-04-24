@@ -1,26 +1,10 @@
-class Expr { }
-
-fun Binop(left, op, right) {
-    var expr   = Expr();
-    expr.kind  = "BinOp";
-    expr.left  = left;
-    expr.right = right;
-    expr.op    = op;
-    return expr;
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print("The " + this.flavor + " cake is " + adjective + "!");
+    }
 }
 
-fun binop_dbg(binop) {
-    print("BinOp(" + binop.op + ", " + binop.left + ", " + binop.right + ")");
-}
-
-fun binop_eval(binop) { null; }
-fun is_binop(expr)    { return expr.kind == "BinOp"; }
-
-var binop = Binop("1", "+", "2");
-binop_dbg(binop);
-
-if (is_binop(binop)) {
-    print("Yes that was a binop.");
-} else {
-    print("No that wass not a binop.");
-}
+var cake = Cake();
+cake.flavor = "German Chocolate";
+cake.taste();

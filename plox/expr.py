@@ -6,6 +6,13 @@ class Expr:
     pass
 
 @dataclass
+class This(Expr):
+    keyword: Token
+
+    def __hash__(self):
+        return hash(f"__builtin_this{self.keyword.line}")
+
+@dataclass
 class Set(Expr):
     object: object
     name  : Token
