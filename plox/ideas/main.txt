@@ -55,7 +55,7 @@ fun main() {
 
     const lit_expr = Literal(100);
 
-    print(is_literal(lit_expr)); // true
+    print(literal?(lit_expr)); // true
 
     literal_dbg(lit_expr); // 100
 
