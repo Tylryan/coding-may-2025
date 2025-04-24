@@ -1,15 +1,11 @@
 
-// At this point, classes are more like
-// structs I think.
-
-class Person {
-    debug(person) {
-        print person.name + " is " + person.age + " years old.";
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print "The " + this.flavor + " cake is " + adjective + "!";
     }
 }
 
-var tyler  = Person();
-tyler.name = "Tyler";
-tyler.age  = "28";
-
-tyler.debug(tyler);
+var cake = Cake();
+cake.flavor = "German Chocolate";
+cake.taste();
