@@ -96,8 +96,8 @@ def scanToken(scanner: ScannerState):
         elif isAlpha(c):
             identifier(scanner)
         else:
-            from lox import serror
-            serror(scanner.line, "unexpected character")
+            print(f"unexpected character: '{c}'")
+            exit(1)
 
 
 def identifier(scanner: ScannerState) -> None:
@@ -133,9 +133,8 @@ def string(scanner: ScannerState) -> None:
         advance(scanner)
 
     if isAtEnd(scanner):
-        from lox import serror 
-        serror(scanner.line, "unterminated string.")
-        return
+        print("[scanner-error] unterminated string.")
+        exit(1)
 
     advance(scanner)
 
@@ -148,7 +147,8 @@ def isDigit(c : str) -> bool:
 def isAlpha(c: str) -> bool:
     return (c >= 'a' and c <= 'z') or\
            (c >= 'A' and c <= 'Z') or\
-           (c == '_')
+           (c == '_') or\
+           (c in ["?"])
 
 def isAlphaNumeric(c: str) -> bool:
     return isDigit(c) or isAlpha(c)

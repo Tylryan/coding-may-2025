@@ -276,7 +276,7 @@ def eval_binary(interp: Interp, expr: Binary) -> object:
         case TokenType.LESS_EQUAL:
             return float(left) <= float(right)
         case TokenType.EQUAL_EQUAL:
-            return float(left) == float(right)
+            return left == right
         case TokenType.BANG_EQUAL:
             return float(left) != float(right)
         case TokenType.MINUS:
