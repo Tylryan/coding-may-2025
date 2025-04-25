@@ -24,9 +24,17 @@ public class LoxFunction implements LoxCallable {
         return null;
     }
 
+    /*
+     * 1. Create a new environment where the functions parent
+     *    is also a parent.
+     * 2. Put the "this" LoxInstance in that new environment.
+     * 3. Strip the declaration from the old Lox function (this
+     *    current one) and place it in a new LoxFunction which
+     *    shall be returned.
+     * BREF: Temporarily putting { "this": LoxInstance } in the
+     * function's scope.
+     */
     LoxFunction bind(LoxInstance instance) {
-        // Make function closure, parent environment to
-        // this new environment.
         Environment environment = new Environment(closure);
         environment.define("this", instance);
         return new LoxFunction(declaration, environment);
