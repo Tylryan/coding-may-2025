@@ -8,3 +8,5 @@ class Cake {
 var cake = Cake();
 cake.flavor = "German Chocolate";
 cake.taste();
+
+this;
