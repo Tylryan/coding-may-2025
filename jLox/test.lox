@@ -1,9 +1,10 @@
 
-class Person {
 
+class Person {
     init(name, age) {
         this.name = name;
         this.age = age;
+        return;
     }
 }
 
