@@ -7,6 +7,7 @@ class FunctionType(Enum):
     NONE     = auto()
     FUNCTION = auto()
     METHOD   = auto()
+    INITIALIZER = auto()
 
 class ClassType(Enum):
     NONE =auto()
@@ -158,6 +159,8 @@ def resolveClassStmt(resolver: Resolver, stmt: Class) -> None:
 
     for method in stmt.methods:
         declaration: FunctionType = FunctionType.METHOD
+        if method.name.lexeme == "init":
+            declaration = FunctionType.INITIALIZER
         resolveFunction(resolver, method, declaration)
 
     endScope(resolver)
@@ -232,6 +235,8 @@ def resolveReturnStmt(resolver: Resolver, stmt: Return) -> None:
         exit(1)
 
     if stmt.value:
+        if resolver.currentFunction == FunctionType.INITIALIZER:
+            print(f"[resolver-error: line {stmt.keyword.line}] Can't return a value from an initializer.")
         resolve(resolver, stmt.value)
 
     return None
