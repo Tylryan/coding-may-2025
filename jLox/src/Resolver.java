@@ -7,12 +7,19 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     final Interpreter interpreter;
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
     private enum FunctionType {
         NONE,
         FUNCTION,
         METHOD
     }
+
+    private enum ClassType {
+        NONE,
+        CLASS
+    }
+
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -119,6 +126,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     // -------------- Other Required Visitors
     @Override
     public Void visitThisExpr(Expr.This expr)   {
+        if (currentClass == ClassType.NONE) {
+            Lox.error(expr.keyword, "Can't use 'this' outside of a class.");
+            return null;
+        }
         resolveLocal(expr, expr.keyword);
         return null;
     }
@@ -137,6 +148,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     // New
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+
         declare(stmt.name);
         define(stmt.name);
 
@@ -149,6 +163,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
 
         endScope();
+        currentClass = enclosingClass;
+
+
         return null;
     }
 
