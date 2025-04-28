@@ -46,10 +46,10 @@ def variable_init(token: Token) -> Expr:
 
 def grouping_init(expr: Expr) -> Expr:
     assert isinstance(expr, Expr)
-    expr             = Expr()
-    expr.kind        = "Grouping"
-    expr.expression  = expr
-    return expr
+    grouping             = Expr()
+    grouping.kind        = "Grouping"
+    grouping.expression  = expr
+    return grouping
 
 def unary_init(operator: Token, right: Expr) -> Expr:
     assert isinstance(operator, Token)
@@ -164,7 +164,7 @@ def expr_to_str(expr: Expr) -> str:
     elif is_logical(expr):
         return logical_to_str(expr)
     elif is_expr(expr):
-        return expr_to_str(expr)
+        return "Expr()"
 
     try:
         print(f"Unimplemented expression: ", expr.kind)
@@ -219,10 +219,6 @@ def lit_to_str(lit_expr: Expr) -> str:
     assert isinstance(lit_expr, Expr)
 
     return str(lit_expr.tok.literal)
-
-def expr_to_str(expr: Expr) -> str:
-    assert isinstance(expr, Expr)
-    return "Expr()"
 
 
 if __name__ == "__main__":

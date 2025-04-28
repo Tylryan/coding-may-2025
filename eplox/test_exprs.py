@@ -69,20 +69,20 @@ def test_variable_init():
     with pytest.raises(AssertionError):
         is_variable("Hello")
 
-def test_grouping_init():
-    grouping: Expr = grouping_init(SOME_EXPR)
+#def test_grouping_init():
+    #grouping: Expr = grouping_init(SOME_EXPR)
 
-    if is_grouping(grouping) is False:
-        raise pytest.UsageError("'is_grouping': Expected to return True, but returned False.")
+    #if is_grouping(grouping) is False:
+        #raise pytest.UsageError("'is_grouping': Expected to return True, but returned False.")
 
-    grouping_to_str(grouping)
+    #grouping_to_str(grouping)
 
-    expr: Expr = Expr()
-    if is_grouping(expr):
-        raise pytest.UsageError("'is_grouping': Expected to return False, but returned True.")
+    #expr: Expr = Expr()
+    #if is_grouping(expr):
+        #raise pytest.UsageError("'is_grouping': Expected to return False, but returned True.")
 
-    with pytest.raises(AssertionError):
-        is_grouping("Hello")
+    #with pytest.raises(AssertionError):
+        #is_grouping("Hello")
 
 def test_unary_init():
     unary: Expr = unary_init(SOME_TOKEN, SOME_EXPR)

@@ -4,6 +4,16 @@ from tokens import Token
 class Stmt:
     kind: str = "Stmt"
 
+def stmt_to_str(stmt: Stmt | Expr) -> str:
+    try:
+        return expr_to_str(stmt)
+    except AssertionError:
+        pass
+
+    if is_expression(stmt):
+        return expression_to_str(stmt)
+    else:
+        raise Exception(f"Unimplemented 'to_str' function for statement kind: '{stmt.kind}'")
 # Expression
 def expression_init(expression: Expr) -> Stmt:
     assert isinstance(expression, Expr)
@@ -17,7 +27,7 @@ def is_expression(stmt: object) -> bool:
     except AttributeError: return False
 
 def expression_to_str(expression: Stmt) -> str:
-    expr = stmt_to_str(expression)
+    expr = stmt_to_str(expression.expression)
     return f"Expression({expr})"
 
 # Return
