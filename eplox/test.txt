@@ -1,0 +1,14 @@
+var a = 10;
+a;
+env;
+
+{
+    var b = a + 1;
+    env;
+    b = b + 1;
+    env;
+
+    a = a + 1;
+}
+
+env;

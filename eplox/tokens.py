@@ -48,7 +48,11 @@ class TokenType(Enum):
     TRUE=auto(), 
     VAR=auto(), 
     WHILE=auto(),
+
+
+    ENV=auto(),
     EOF=auto()
+
 
 
 @dataclass

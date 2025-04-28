@@ -164,6 +164,10 @@ def parse_primary() -> Expr:
     if matches(TokenType.NIL):
         return lit_init(prev())
 
+    # Just for temp debugging
+    if matches(TokenType.ENV):
+        return env_init()
+
     if matches(TokenType.NUMBER, TokenType.STRING):
         return lit_init(prev())
 
@@ -219,6 +223,6 @@ def matches(*kinds: TokenType) -> bool:
 
 if __name__ == "__main__":
     from scanner import scan
-    tokens = scan("{var a = 10; }")
+    tokens = scan("{var a = 10; env;}")
     exprs = parse(tokens)
     [ print(stmt_to_str(x)) for x in exprs ]

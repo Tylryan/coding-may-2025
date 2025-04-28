@@ -18,6 +18,7 @@ def stmt_to_str(stmt: Stmt | Expr) -> str:
         return block_to_str(stmt)
     else:
         raise Exception(f"Unimplemented 'to_str' function for statement kind: '{stmt.kind}'")
+
 # Expression
 def expression_init(expression: Expr) -> Stmt:
     assert isinstance(expression, Expr)

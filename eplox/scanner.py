@@ -23,7 +23,8 @@ class ScannerState:
         "true"  : TokenType.TRUE,
         "var"   : TokenType.VAR,
         "while" : TokenType.WHILE,
-        "nil"   : TokenType.NIL
+        "nil"   : TokenType.NIL,
+        "env"   : TokenType.ENV
     }
 
     def __init__(self, source: str):
