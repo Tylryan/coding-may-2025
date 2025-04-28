@@ -5,6 +5,9 @@ from exprs import *
 from stmt import *
 
 
+# In our case, a language is just a list of
+# declarations.
+
 global parser
 
 class Parser:
@@ -24,16 +27,37 @@ def parse(tokens: list[Token]) -> list[Expr]:
 
     exprs = []
     while is_at_end() == False:
-        expr = parse_expr_stmt()
+        expr = parse_declaration()
         exprs.append(expr)
 
     return exprs
+
+# ---------- STATEMENTS
+def parse_declaration() -> Stmt:
+    if matches(TokenType.VAR):
+        return parse_var_dec()
+    return parse_statement()
+
+def parse_var_dec() -> Stmt:
+    name: Token = consume(TokenType.IDENTIFIER,
+                          f"Expect variable name on line {prev().line}")
+    initializer: Expr = None
+    if matches(TokenType.EQUAL):
+        initializer = parse_expression()
+
+    consume(TokenType.SEMICOLON, 
+            f"Expect ';' after variable declaration on line {prev().line}")
+    return var_init(name, initializer)
+
+def parse_statement() -> Stmt:
+    return parse_expr_stmt()
 
 def parse_expr_stmt():
     expr: Expr = parse_expression()
     consume(TokenType.SEMICOLON, f"Expect ';' after expression statement on line {peek().line}")
     return expression_init(expr)
 
+# -------------- EXPRESSIONS
 def parse_expression() -> Expr:
     return parse_assignment()
 
@@ -148,7 +172,9 @@ def parse_primary() -> Expr:
 
 def advance() -> bool:
     global parser
+    tok: Token = parser.tokens[parser.index]
     parser.index+=1
+    return tok
 
 def is_at_end() -> bool:
     eof = parser.tokens[parser.index].kind == TokenType.EOF
@@ -191,6 +217,6 @@ def matches(*kinds: TokenType) -> bool:
 
 if __name__ == "__main__":
     from scanner import scan
-    tokens = scan("(5 + 10); 8 / 9;")
+    tokens = scan("var a = 10; a = 5 + 2;")
     exprs = parse(tokens)
     [ print(stmt_to_str(x)) for x in exprs ]

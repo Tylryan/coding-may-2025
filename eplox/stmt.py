@@ -12,6 +12,8 @@ def stmt_to_str(stmt: Stmt | Expr) -> str:
 
     if is_expression(stmt):
         return expression_to_str(stmt)
+    elif is_var(stmt):
+        return var_to_str(stmt)
     else:
         raise Exception(f"Unimplemented 'to_str' function for statement kind: '{stmt.kind}'")
 # Expression
@@ -143,4 +145,4 @@ def is_var(stmt: object) -> bool:
 def var_to_str(var: Stmt) -> str:
     name: str = var.name.lexeme
     init: Expr = expr_to_str(var.initializer)
-    return f"Block()"
+    return f"Var('{name}', {init})"
