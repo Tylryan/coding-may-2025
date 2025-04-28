@@ -14,6 +14,8 @@ def stmt_to_str(stmt: Stmt | Expr) -> str:
         return expression_to_str(stmt)
     elif is_var(stmt):
         return var_to_str(stmt)
+    elif is_block(stmt):
+        return block_to_str(stmt)
     else:
         raise Exception(f"Unimplemented 'to_str' function for statement kind: '{stmt.kind}'")
 # Expression
@@ -112,7 +114,7 @@ def if_to_str(ret: Stmt) -> str:
     return f"If()"
 # Block
 def block_init(statements: list[Stmt]) -> Stmt:
-    assert isinstance(statements, list[Stmt])
+    assert isinstance(statements, list)
 
     stmt = Stmt()
     stmt.kind       = "Block"
@@ -124,8 +126,13 @@ def is_block(stmt: object) -> bool:
     except AttributeError: return False
 
 def block_to_str(block: Stmt) -> str:
-    name: str = block.name.lexeme
-    return f"Block()"
+    string = "Block("
+
+    for s in block.statements:
+        string+= stmt_to_str(s) + ", "
+    string += ")"
+    return string
+
 
 # Var
 def var_init(name: Token, initializer: Expr) -> Stmt:

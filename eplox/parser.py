@@ -50,7 +50,17 @@ def parse_var_dec() -> Stmt:
     return var_init(name, initializer)
 
 def parse_statement() -> Stmt:
+    if matches(TokenType.LEFT_BRACE):
+        return block_init(parse_block())
     return parse_expr_stmt()
+
+def parse_block() -> list[Stmt]:
+    statements: list[Stmt] = []
+    while ((not check(TokenType.RIGHT_BRACE)) and (not is_at_end())):
+        statements.append(parse_declaration())
+
+    consume(TokenType.RIGHT_BRACE, f"Expect '}}' after block on line '{peek().line}'.")
+    return statements
 
 def parse_expr_stmt():
     expr: Expr = parse_expression()
@@ -166,7 +176,7 @@ def parse_primary() -> Expr:
         return grouping_init(expr)
 
 
-    print(f"[parser-error] unimplemented token: '{peek()}")
+    print(f"[parser-error] unimplemented token: '{peek()}'.")
     exit(1)
 
 
@@ -177,13 +187,7 @@ def advance() -> bool:
     return tok
 
 def is_at_end() -> bool:
-    eof = parser.tokens[parser.index].kind == TokenType.EOF
-    past = parser.index >= parser.len
-
-    if past or eof:
-        return True
-
-    return False
+    return parser.tokens[parser.index].kind == TokenType.EOF
 
 def consume(type: TokenType, message: str) -> Token:
     if check(type):
@@ -192,8 +196,6 @@ def consume(type: TokenType, message: str) -> Token:
     exit(1)
 
 def peek() -> Token:
-    if is_at_end() == True:
-        return None
     return parser.tokens[parser.index]
 
 def prev() -> Token:
@@ -217,6 +219,6 @@ def matches(*kinds: TokenType) -> bool:
 
 if __name__ == "__main__":
     from scanner import scan
-    tokens = scan("var a = 10; a = 5 + 2;")
+    tokens = scan("{var a = 10; }")
     exprs = parse(tokens)
     [ print(stmt_to_str(x)) for x in exprs ]
