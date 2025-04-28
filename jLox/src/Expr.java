@@ -14,6 +14,23 @@ abstract public class Expr {
         R visitGetExpr(Get expr);
         R visitSetExpr(Set expr);
         R visitThisExpr(This expr);
+        R visitSuperExpr(Super expr);
+    }
+
+    static class Super extends Expr {
+        final Token keyword;
+        final Token method;
+
+        Super(Token keyword, Token method) {
+            this.keyword = keyword;
+            this.method = method;
+        }
+
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return null;
+        }
     }
 
     static class This extends Expr {

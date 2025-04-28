@@ -1,15 +1,16 @@
 
+class Dessert {
+    eat(kind) {
+        print "Mmm. That " + kind + " was good.";
+    }
+}
 
-class Person {
-    init(name, age) {
-        this.name = name;
-        this.age = age;
-        return "hello";
+class B < Dessert {
+    cook() {
+        print "Fry until golden brown.";
     }
 }
 
 
-var tyler = Person("Tyler", 28);
 
-print tyler.name;
-print tyler.age;
+B().eat("Pie");
