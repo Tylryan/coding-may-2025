@@ -1,9 +1,11 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
+
 from tokens import Token, TokenType
 from exprs import *
 from stmt import *
+from lox_callable import LoxCallable
+from ereturn import EReturn
 
 class Env:
     values: dict[str, object]
@@ -39,6 +41,25 @@ class Env:
         exit(1)
 
 
+@dataclass
+class LoxFun(LoxCallable):
+    declaration: Expr
+    closure: Env
+
+    def call(self, interpreter: Interpreter, arguments: list[object]) -> object:
+        environment: Env = Env(self.closure)
+
+        for i, param in enumerate(self.declaration.params):
+            environment.define(param.lexeme, arguments[i])
+
+        try:
+            block_eval(self.declaration.body, environment)
+        except EReturn as ret_val:
+            return ret_val.value
+
+    def arity(self) -> int:
+        return len(self.declaration.params)
+
 class Interpreter:
     exprs: list[Expr]
     env: Env
@@ -68,16 +89,47 @@ def evaluate(expr: Expr) -> object:
         elif is_variable(expr): return variable_eval(expr)
         elif is_env(expr)     : return print(interpreter.env.values)
         elif is_assign(expr)  : return assign_eval(expr)
+        elif is_call(expr)    : return fun_call_eval(expr)
     except AssertionError:
         if is_expression(expr): return expression_eval(expr)
         elif is_var(expr)     : return var_eval(expr)
         elif is_block(expr)   : return block_eval(expr, Env(interpreter.env))
+        elif is_function(expr): return fun_dec_eval(expr)
+        elif is_return(expr)  : return return_eval(expr)
     except Exception as e:
         print(e)
         exit(1)
 
     print(f"[interpreter-error] unimplemented expression: `{stmt_to_str(expr)}`")
     exit(1)
+
+def return_eval(expr: Expr) -> None:
+    value: object = None
+    if expr.value:
+        value = evaluate(expr.value)
+    raise EReturn(value)
+
+# Callable Expr
+def fun_call_eval(expr: Expr) -> object:
+    callee: object = evaluate(expr.callee)
+
+    args: list[object] = []
+    for arg in expr.arguments:
+        args.append(evaluate(arg))
+
+    if isinstance(callee, LoxCallable) is False:
+        print("[interpreter-error] Can only call functions")
+        exit(1)
+
+    fun: LoxCallable = callee
+    return fun.call(interpreter, args)
+
+
+def fun_dec_eval(fun: Expr) -> object:
+    lox_fun: LoxFun = LoxFun(fun,
+                             interpreter.env)
+    interpreter.env.define(fun.name.lexeme, lox_fun)
+    return None
 
 def assign_eval(assign: Expr) -> object:
     value: object = evaluate(assign.value)
@@ -107,7 +159,7 @@ def block_eval(block: Expr, env: Env) -> None:
 
     try:
         interpreter.env = env
-        for stmt in block.statements:
+        for stmt in block:
             evaluate(stmt)
     finally:
         interpreter.env = previous

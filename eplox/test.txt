@@ -1,5 +1,12 @@
-fun hello(name, age) {
-    return 1;
+
+
+fun add(a, b) {
+    return a + b;
 }
 
-hello("Tyler", 28);
+
+var b = add(1, 2);
+env;
+
+
+
