@@ -1,14 +1,5 @@
-var a = 10;
-a;
-env;
-
-{
-    var b = a + 1;
-    env;
-    b = b + 1;
-    env;
-
-    a = a + 1;
+fun hello(name, age) {
+    return 1;
 }
 
-env;
+hello("Tyler", 28);

@@ -16,24 +16,26 @@ def stmt_to_str(stmt: Stmt | Expr) -> str:
         return var_to_str(stmt)
     elif is_block(stmt):
         return block_to_str(stmt)
+    elif is_function(stmt):
+        return function_to_str(stmt)
     else:
         raise Exception(f"Unimplemented 'to_str' function for statement kind: '{stmt.kind}'")
 
-# Expression
-def expression_init(expression: Expr) -> Stmt:
-    assert isinstance(expression, Expr)
-    stmt = Stmt()
-    stmt.kind = "Expression"
-    stmt.expression = expression
-    return stmt
+def function_init(name: Token, params: list[Token], body: list[Stmt]) -> Stmt:
+    f = Stmt()
+    f.kind = "Function"
+    f.name = name
+    f.params = params
+    f.body = body
+    return f
 
-def is_expression(stmt: object) -> bool:
-    try: return stmt.kind == "Expression"
+def is_function(stmt: object) -> bool:
+    try: return stmt.kind == "Function"
     except AttributeError: return False
 
-def expression_to_str(expression: Stmt) -> str:
-    expr = stmt_to_str(expression.expression)
-    return f"Expression({expr})"
+def function_to_str(f: Stmt) -> str:
+    return f"Function({f.name.lexeme})"
+
 
 # Return
 def return_init(keyword: Token, value: Expr) -> Stmt:
@@ -53,11 +55,28 @@ def return_to_str(ret: Stmt) -> str:
     value: str = expr_to_str(ret.value)
     return f"Return({value})"
 
+# Expression
+def expression_init(expression: Expr) -> Stmt:
+    assert isinstance(expression, Expr)
+    stmt = Stmt()
+    stmt.kind = "Expression"
+    stmt.expression = expression
+    return stmt
+
+def is_expression(stmt: object) -> bool:
+    try: return stmt.kind == "Expression"
+    except AttributeError: return False
+
+def expression_to_str(expression: Stmt) -> str:
+    expr = stmt_to_str(expression.expression)
+    return f"Expression({expr})"
+
+
 # Function
 def function_init(name: Token, params: list[Token], body: list[Stmt]) -> Stmt:
     assert isinstance(name, Token)
-    assert isinstance(params, list[Token])
-    assert isinstance(body, list[Stmt])
+    assert isinstance(params, list)
+    assert isinstance(body, list)
 
     stmt = Stmt()
     stmt.kind = "Function"
@@ -72,7 +91,12 @@ def is_function(stmt: object) -> bool:
 
 def function_to_str(ret: Stmt) -> str:
     name: str = ret.name.lexeme
-    return f"Function({name})"
+    params = "Params("
+    for x in ret.params:
+        params += f"{x.lexeme},"
+    params += ")"
+
+    return f"Function('{name}', {params})"
 
 # While
 def while_init(condition: Expr, body: Stmt) -> Stmt:

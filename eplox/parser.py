@@ -36,7 +36,29 @@ def parse(tokens: list[Token]) -> list[Expr]:
 def parse_declaration() -> Stmt:
     if matches(TokenType.VAR):
         return parse_var_dec()
+    if matches(TokenType.FUN):
+        return parse_function_dec()
     return parse_statement()
+
+def parse_function_dec() -> Stmt:
+    name: Token = consume(TokenType.IDENTIFIER, f"Expect function name in function on line {prev().line}.")
+    consume(TokenType.LEFT_PAREN,
+            f"Expect '(' after function name on line {name.line}.")
+
+    params: list[Token] = []
+    if not check(TokenType.RIGHT_PAREN):
+        while True:
+            params.append(consume(TokenType.IDENTIFIER,
+                                  f"Expect parameter name in function signature on line {prev().line}."))
+            if matches(TokenType.COMMA) is False:
+                break
+    consume(TokenType.RIGHT_PAREN, 
+            f"Expect ')' after function parameters on line {peek().line}")
+    consume(TokenType.LEFT_BRACE, 
+            f"Missing '{{' after function signature on line {peek().line}")
+    
+    body: list[Stmt] = parse_block()
+    return function_init(name, params, body)
 
 def parse_var_dec() -> Stmt:
     name: Token = consume(TokenType.IDENTIFIER,
@@ -52,7 +74,18 @@ def parse_var_dec() -> Stmt:
 def parse_statement() -> Stmt:
     if matches(TokenType.LEFT_BRACE):
         return block_init(parse_block())
+    if matches(TokenType.RETURN):
+        return parse_return()
     return parse_expr_stmt()
+
+def parse_return() -> Stmt:
+    keyword: Token = prev()
+    value: Expr = None
+    if not check(TokenType.SEMICOLON):
+        value = parse_expression()
+    consume(TokenType.SEMICOLON,
+            f"Expect ';' after return value on line {keyword.line}.")
+    return return_init(keyword, value)
 
 def parse_block() -> list[Stmt]:
     statements: list[Stmt] = []
@@ -140,11 +173,11 @@ def parse_term() -> Expr:
     return left
 
 def parse_fact() -> Expr:
-    left: Expr = parse_primary()
+    left: Expr = parse_unary()
 
     while matches(TokenType.STAR, TokenType.SLASH):
         op: Token = prev()
-        right: Expr = parse_primary()
+        right: Expr = parse_unary()
         left = binop_init(left, op, right)
 
     return left
@@ -154,6 +187,29 @@ def parse_unary() -> Expr:
         op: Token = prev()
         right: Expr = parse_unary()
         return unary_init(op, right)
+    return parse_call()
+
+def parse_call() -> Expr:
+    def finish_call(callee: Expr) -> Expr:
+        args: list[Expr] = []
+        if not check(TokenType.RIGHT_PAREN):
+            while True:
+                new_expr = parse_expression()
+                args.append(new_expr)
+
+                if matches(TokenType.COMMA) is False:
+                    break
+        paren: Token = consume(TokenType.RIGHT_PAREN,
+                               "Expect ')' after arguments.")
+        return call_init(callee, paren, args)
+
+    expr: Expr = parse_primary()
+    while True:
+        if matches(TokenType.LEFT_PAREN):
+            expr = finish_call(expr)
+        else:
+            break
+    return expr
 
 def parse_primary() -> Expr:
     
@@ -223,6 +279,12 @@ def matches(*kinds: TokenType) -> bool:
 
 if __name__ == "__main__":
     from scanner import scan
-    tokens = scan("{var a = 10; env;}")
+    def read_file(path: str) -> str:
+        f = open(path)
+        c = f.read()
+        f.close()
+        return c
+
+    tokens = scan(read_file("test.txt"))
     exprs = parse(tokens)
     [ print(stmt_to_str(x)) for x in exprs ]
