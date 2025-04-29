@@ -154,12 +154,14 @@ def grouping_eval(grouping: Expr) -> object:
 def expression_eval(expression: Stmt) -> object:
     return evaluate(expression.expression)
 
-def block_eval(block: Expr, env: Env) -> None:
+def block_eval(block: Stmt, env: Env) -> None:
+    assert isinstance(block, Stmt)
+
     previous: Env = interpreter.env
 
     try:
         interpreter.env = env
-        for stmt in block:
+        for stmt in block.statements:
             evaluate(stmt)
     finally:
         interpreter.env = previous

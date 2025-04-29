@@ -1,12 +1,12 @@
 
-
-fun add(a, b) {
-    return a + b;
+var a = 1;
+fun print() {
+    var c = a;
+    env;
 }
 
-
-var b = add(1, 2);
-env;
-
-
-
+{
+    var a = 2;
+    var c = print();
+    env;
+}

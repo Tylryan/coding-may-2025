@@ -73,10 +73,10 @@ def expression_to_str(expression: Stmt) -> str:
 
 
 # Function
-def function_init(name: Token, params: list[Token], body: list[Stmt]) -> Stmt:
+def function_init(name: Token, params: list[Token], body: Stmt) -> Stmt:
     assert isinstance(name, Token)
     assert isinstance(params, list)
-    assert isinstance(body, list)
+    assert isinstance(body, Stmt)
 
     stmt = Stmt()
     stmt.kind = "Function"

@@ -73,7 +73,7 @@ def parse_var_dec() -> Stmt:
 
 def parse_statement() -> Stmt:
     if matches(TokenType.LEFT_BRACE):
-        return block_init(parse_block())
+        return parse_block()
     if matches(TokenType.RETURN):
         return parse_return()
     return parse_expr_stmt()
@@ -87,13 +87,13 @@ def parse_return() -> Stmt:
             f"Expect ';' after return value on line {keyword.line}.")
     return return_init(keyword, value)
 
-def parse_block() -> list[Stmt]:
+def parse_block() -> Stmt:
     statements: list[Stmt] = []
     while ((not check(TokenType.RIGHT_BRACE)) and (not is_at_end())):
         statements.append(parse_declaration())
 
     consume(TokenType.RIGHT_BRACE, f"Expect '}}' after block on line '{peek().line}'.")
-    return statements
+    return block_init(statements)
 
 def parse_expr_stmt():
     expr: Expr = parse_expression()
