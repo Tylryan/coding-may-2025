@@ -7,6 +7,6 @@ fun print() {
 
 {
     var a = 2;
-    var c = print();
+    print();
     env;
 }

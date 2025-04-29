@@ -77,7 +77,7 @@ def interpret(exprs: list[Expr]) -> object:
     interpreter_init(exprs)
 
     for expr in exprs:
-        print("RES: ", evaluate(expr))
+        evaluate(expr)
         print("Next Expression")
 
 
