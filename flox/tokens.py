@@ -20,6 +20,7 @@ class TokenKind(Enum):
     FALSE=auto()
     NULL=auto()
     STRING=auto()
+    IDENT=auto()
 
     # Operators
     PLUS=auto()

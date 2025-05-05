@@ -72,8 +72,6 @@ def scan(source: str) -> list[Token]:
 
 def handle_string(tokens: list[Token]) -> None:
     global scanner
-    # 1. Keyword
-    # 2. Idenntifier
     line_no = line()
     advance()
     string = ""
@@ -127,13 +125,18 @@ def handle_alpha(tokens: list[Token]) -> None:
     global scanner
     # 1. Keyword
     # 2. Idenntifier
+    line_no = line()
     string = advance()
 
     while peek().isspace() is False:
         string += advance()
         if string in scanner.keywords.keys():
             tokens.append(scanner.keywords[string](line()))
-            return
+            return None
+    
+    tokens.append(Token(TokenKind.IDENT, string, None, line_no))
+    return None
+    
 
 def handle_digit(tokens: list[Token]) -> None:
     number: str = advance()

@@ -8,6 +8,9 @@ true
 false
 null
 "strings"
+some_identifier
+some-other-identifier
+string->int
 
 // Arithmetic
 + - * / %
