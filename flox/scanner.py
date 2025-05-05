@@ -179,8 +179,9 @@ def handle_slash(tokens: list[Token]) -> None:
 
     def handle_single_line_comment():
         comment = slash
-        while peek() != "\n":
-            comment += advance()
+        while at_end() is False and peek() != "\n":
+            comment+= advance()
+
 
         comment+= advance()
         new_line()
@@ -205,12 +206,12 @@ def line() -> int:
 
 def peek() -> str:
     global scanner
-    if at_end(): return "\0"
+    if at_end(): return Token(TokenKind.EOF, "EOF", None, 0)
     return scanner.source[scanner.index]
 
 def at_end() -> bool:
     global scanner
-    return scanner.index >= len(scanner.source)
+    return (scanner.index >= len(scanner.source))
 
 def advance() -> str:
     global scanner
