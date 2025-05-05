@@ -1,0 +1,7 @@
+// My single line comment
+
+/* My multiline comment
+ * starting her eright
+ * now
+ */
+(1.0 + 2.0) * 10.0 % 5.0 / 2.0;

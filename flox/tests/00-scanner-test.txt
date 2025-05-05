@@ -1,0 +1,36 @@
+// Keywords
+var fun if else while return
+
+// Types
+1
+1.2
+true
+false
+null
+"strings"
+
+// Arithmetic
++ - * / %
+
+// Comparison Operators
+=
+==
+!
+!=
+>
+<
+>=
+<=
+
+// Logical Operators
+and
+or
+
+// Punctuation
+;
+{}
+()
+,
+
+
+

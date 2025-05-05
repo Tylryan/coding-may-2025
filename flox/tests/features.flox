@@ -1,0 +1,23 @@
+
+
+fun add(left, right) {
+    return left + right;
+}
+
+// Single line comment
+
+/* A Multi-
+ * line comment.
+ */
+var a = if (add(1,2) == 2) { "NOPE" }
+        else               { "YEP" }
+
+
+var i = 0;
+while (true) {
+    if (i >= 10) {
+        break;
+    }
+
+    i++;
+}
