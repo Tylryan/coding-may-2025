@@ -11,6 +11,7 @@ class TokenKind(Enum):
     RETURN   = auto()
     BREAK    = auto()
     CONTINUE = auto()
+    ENV      = auto()
 
     # Types
     NUMBER = auto()
