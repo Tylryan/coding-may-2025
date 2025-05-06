@@ -3,15 +3,23 @@ This language will basically be Lox (Crafting Interpreters), but with most every
 being an Expression.
 
 
-```
+```js
 var a = 0;
 var b = 1;
 var c = if (a)      { "NOPE" }
         else if (b) { "YEP"  }
         else        { "NOPE" };
+
+fun fact(n) {
+        if (n <= 1 ) { 1 }
+        // Implicit return where
+        // "return" is optional.
+        5 * fib(n - 1)
+}
 ```
 
-## Preprocessor Work and Macros
+## Some Interesting Ideas
+### Preprocessor Work and Macros
 I'm thinking of a preprocessor with it's own mini language that will 
 be evaluated before compile. The preprocessor's main job will be:
  1. Declaring Macros, which will be expanded before compile time.
@@ -33,7 +41,7 @@ preprocesser {
     // can be used anywhere in the program after they
     // are defined and included.
     macros {
-        macro $PI 3.14;
+        macro $PI = 3.14;
         macro $is_type(expr, type) { 
             if (expr.kind == type) {
                 // Not a return from a function!
@@ -56,8 +64,8 @@ preprocesser {
         var a = $PI * 2;
     }
 
-    $undefine(__linux__);
 }
+$undefine(__linux__);
 
 // Macros can be anywhere in the code after they are defined.
 fun main() {
@@ -74,5 +82,74 @@ fun main() {
         print("This should be false.");
     }
 }
+```
 
+
+### Private Code
+
+```js
+// Create private blocks that contain code
+// only visible in the current file.
+private {
+        fun secret_helper(x) { 
+                return x + x; 
+        }
+        fun other_secret_helper(y) {
+                return secret_helper(y) * secret_helper(y);
+        }
+}
+
+fun public_function(y) {
+        return other_secret_helper(y);
+}
+
+
+// private code within the same file is visible.
+fun main() {
+        // These two print statements would display
+        // the same thing.
+        print(other_secret_helper(10));
+        print(public_function(10));
+}
+```
+
+### Structs.
+```js
+// @allargs is already provided
+// by default.
+struct Person { name, age };
+
+// However, if you wanted to define your own 
+// initializer, you could use a static method.
+// Note the implicit return.
+fun Person::new(name, age) { Person(name, age) }
+fun Person::from(tuple) {
+        name = tuple.get(0);
+        age = tuple.get(1);
+
+        Person(name, age);
+}
+
+// Methods can be added to structs at any
+// point in the program. This idea came from
+// traits in Rust.
+extend Person {
+        fun greet(self, other) {
+                print($format("Hello '{other.name}', my name is '{self.name}'." ));
+        }
+
+        fun Person::compare(lhs, rhs) {
+                if (lhs.age == rhs.age)     { 0  }
+                else if (lhs.age > rhs.age) { 1  }
+                else                        { -1 }
+        }
+}
+
+fun main() {
+        me  = Person("Me", 1000);
+        you = Person::new("You", 10001);
+
+        me.greet(you);            // "Hello 'You', my name is 'Me'.
+        Person::compare(me, you); // -1
+}
 ```
