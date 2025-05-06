@@ -37,7 +37,8 @@ def parse_variable_declaration() -> Expr:
     # "var" IDENT ("=" Expr)? ";"
 
     if check(TokenKind.IDENT) is False:
-        print(f"[parser-error] missing variable identifier in variable declaration on line {peek().line}.")
+        print(f"[parser-error] missing variable identifier "
+              f"in variable declaration on line {peek().line}.")
         exit(1)
 
     name: Variable  = parse_primary()
@@ -48,14 +49,16 @@ def parse_variable_declaration() -> Expr:
 
     vardec = VarDec(name, value)
     consume(TokenKind.SEMI,
-            f"missing ';' after variable declaration on line {name.token.line}.")
+            f"missing ';' after variable declaration on line "
+            f"{name.token.line}.")
     return vardec
 
 def parse_expression_statement() -> Expr:
     line_start = peek().line
     expr: Expr = parse_expression()
     consume(TokenKind.SEMI, 
-            f"missing ';' after expression statement around line {line_start}.")
+            f"missing ';' after expression statement around line "
+            f"{line_start}.")
     return expr
 
 def parse_expression() -> Expr:
@@ -66,12 +69,10 @@ def parse_assignment() -> Expr:
     # a = 10;
 
     name: Expr = parse_term()
-
     if matches(TokenKind.EQUAL) is False:
         return name
 
     value: Expr = parse_expression()
-
     return Assign(name, value)
 
 
@@ -111,7 +112,8 @@ def parse_primary() -> Expr:
     if matches(TokenKind.IDENT):
         return Variable(prev())
     
-    raise Exception(f"[parser-error] unimplemented token: '{peek().lexeme}'")
+    raise Exception(f"[parser-error] unimplemented token: "
+                    f"'{peek().lexeme}'")
 
 def prev() -> Token:
     global parser

@@ -45,9 +45,11 @@ class VarDec(Expr):
     value: Expr
 
     def to_dict(self) -> dict[str, object]:
-        return {"var-dec": {
-            "name": self.name.to_dict(),
-            "value": self.value.to_dict() if self.value else "null"
+        return {
+            "var-dec": {
+            "name"   : self.name.to_dict(),
+            "value"  : self.value.to_dict() if self.value \
+                                            else "null"
             }
         }
 
@@ -56,7 +58,7 @@ class Variable(Expr):
     token: Token
 
     def to_dict(self) -> dict[str, object]:
-        return {"variable": self.token.lexeme}
+        return { "variable": self.token.lexeme }
 
 @dataclass
 class Assign(Expr):
@@ -64,7 +66,9 @@ class Assign(Expr):
     value: Expr
 
     def to_dict(self) -> dict[str, object]:
-        return {"assign": {
-            "name": self.name.to_dict(),
-            "value": self.value.to_dict()}
+        return {
+            "assign": {
+            "name"  : self.name.to_dict() ,
+            "value" : self.value.to_dict(),
+            }
         }
