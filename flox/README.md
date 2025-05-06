@@ -153,3 +153,61 @@ fun main() {
         Person::compare(me, you); // -1
 }
 ```
+
+### Types
+```js
+type Expr = Literal
+           | Binary ;
+
+struct Literal { number: f64 };
+struct Binary  { 
+        left : Expr , 
+        op   : str  ,
+        right: Expr 
+};
+
+extend Literal {
+        fun as_map(self) -> HashMap[str, object] { 
+                hm: HashMap::new();
+                hm.put("literal", self.token.value);
+                return hm
+        }
+}
+
+extend Binary {
+        fun as_map(self) -> HashMap[str, object] { 
+                binary_expr: HashMap::new();
+                inner: HashMap::new();
+
+                inner.put("left", self.left.as_map());
+                inner.put("op", self.op);
+                inner.put("right", self.right.as_map());
+
+                hm.put("binary-expr", inner);
+                return hm
+        }
+}
+
+// Not practical, but the example is clear.
+fun print_expr(expr: Expr) -> null {
+        match (expr) {
+                Literal => print(expr.as_map()),
+                Binary => print(binary.as_map()),
+        }
+}
+
+fun main() {
+        var bin_op: Binary = Binary(Literal(1), "+", Literal(2));
+
+        print_expr(bin_op);
+        // OUTPUT
+        //{
+        //        "binary-expr": {
+        //                "left" : 1,
+        //                "op"   : "+",
+        //                "right": 2
+        //        }
+        //}
+}
+
+```
