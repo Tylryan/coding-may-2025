@@ -105,3 +105,11 @@ class If(Expr):
     predicate: Expr
     then_branch: Expr
     else_branch: Expr
+
+    def to_dict(self) -> dict[str, object]:
+        return {"if": {
+            "predicate"  : self.predicate.to_dict(),
+            "then-branch": self.then_branch.to_dict(),
+            "else-branch": self.else_branch.to_dict() if self.else_branch \
+                                                      else Null().to_dict()
+        }}

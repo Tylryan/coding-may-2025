@@ -33,12 +33,19 @@ def evaluate(expr: Expr) -> object:
     elif isinstance(expr, Environ) : return eval_environ(expr)
     elif isinstance(expr, Block)   : return eval_block(expr, Env(interpreter.env))
     elif isinstance(expr, Assign)  : return eval_assign(expr)
+    elif isinstance(expr, If)      : return eval_if(expr)
 
     else:
         print(f"[interpreter-error] unimplemented expression:"
               f"\n{expr.to_dict()}")
         exit(1)
 
+
+def eval_if(expr: If) -> object:
+    if evaluate(expr.predicate):
+        return evaluate(expr.then_branch)
+    else:
+        return evaluate(expr.else_branch)
 
 def eval_assign(expr: Assign) -> object:
     val: object = evaluate(expr.value)
