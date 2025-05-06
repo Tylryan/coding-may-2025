@@ -57,14 +57,20 @@ def parse_expression_statement() -> Expr:
     line_start = peek().line
     if matches(TokenKind.ENV):
         return parse_env()
-    if matches(TokenKind.LBRACE):
-        return parse_block()
 
 
     expr: Expr = parse_expression()
-    consume(TokenKind.SEMI, 
-            f"missing ';' after expression statement around line "
-            f"{line_start}.")
+
+    # NOTE(tyler): I'm thinking about getting rid of
+    # this concept entirely and delegating the semicolon
+    # check to the declarations or other expressions that
+    # require them.
+    # I would simply move expression_statement and just use
+    # expression()
+    if matches(TokenKind.SEMI): pass
+    # consume(TokenKind.SEMI, 
+    #         f"missing ';' after expression statement around line "
+    #         f"{line_start}.")
     return expr
 
 def parse_block() -> Block:
@@ -92,10 +98,9 @@ def parse_env() -> Expr:
     return Environ(keyword)
 
 def parse_expression() -> Expr:
+    if matches(TokenKind.LBRACE):
+        return parse_block()
     return parse_assignment()
-
-
-
 
 def parse_assignment() -> Expr:
     # Assign(Variable(a), Expr)

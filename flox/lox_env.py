@@ -22,7 +22,7 @@ class Env:
             return None
         
         if self.parent:
-            return self.assign(name, value)
+            return self.parent.assign(name, value)
         
         print(f"[environment-error] cannot assign to an undefined variable "
               f"'{name.lexeme}' on line {name.line}.")

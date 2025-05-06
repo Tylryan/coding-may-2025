@@ -85,6 +85,16 @@ class Block(Expr):
     exprs: list[Expr]
 
     def to_dict(self) -> dict[str, object]:
-        return {
-            "block": [expr.to_dict() for expr in self.exprs]
-        }
+        inner: list[dict[str, object]] = []
+        for expr in self.exprs:
+            if not expr:
+                continue
+            inner.append(expr.to_dict())
+
+        return { "block": inner }
+
+@dataclass
+class Null(Expr):
+    
+    def to_dict(self) -> dict[str, object]:
+        return {"null": None}

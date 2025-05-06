@@ -1,29 +1,20 @@
-/* Here is a description of this code.
- * it spans multiple lines
- */
+var a = { 1 };
+var b = 1;
+env;
+{
+   // 'a' should be shadowed, but not
+   // overwritten.
+   var a = 10;
+   env; // [{'a': 1 },{ 'a': 10 }]
+}
 
- //var a = 1;
- //{
- //   // 'a' should be shadowed, but not
- //   // overwritten.
- //   var a = 10;
- //   env; // [{'a': 1 },{ 'a': 10 }]
- //}
+env; // {'a': 1}
 
- //env; // {'a': 1}
-
-
- //{
- //   // Should be able to find 'a'
- //   // and overwrite it.
- //   a = 10;
- //}
-
- //env; //{'a': 10 }
-
-var a = 10;
 
 {
-    var b = 10;
-    a = 20;
+   // Should be able to find 'a'
+   // and overwrite it.
+   a = 10;
 }
+
+env; //{'a': 10 }
