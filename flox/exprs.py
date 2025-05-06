@@ -37,3 +37,34 @@ class Grouping(Expr):
 
     def to_dict(self) -> dict[str, object]:
         return { "grouping": self.expr.to_dict() }
+
+
+@dataclass
+class VarDec(Expr):
+    name: Variable
+    value: Expr
+
+    def to_dict(self) -> dict[str, object]:
+        return {"var-dec": {
+            "name": self.name.to_dict(),
+            "value": self.value.to_dict() if self.value else "null"
+            }
+        }
+
+@dataclass
+class Variable(Expr):
+    token: Token
+
+    def to_dict(self) -> dict[str, object]:
+        return {"variable": self.token.lexeme}
+
+@dataclass
+class Assign(Expr):
+    name: Variable
+    value: Expr
+
+    def to_dict(self) -> dict[str, object]:
+        return {"assign": {
+            "name": self.name.to_dict(),
+            "value": self.value.to_dict()}
+        }

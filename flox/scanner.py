@@ -128,7 +128,7 @@ def handle_alpha(tokens: list[Token]) -> None:
     line_no = line()
     string = advance()
 
-    while peek().isspace() is False:
+    while at_end() is False and peek().isalnum():
         string += advance()
         if string in scanner.keywords.keys():
             tokens.append(scanner.keywords[string](line()))
@@ -206,7 +206,6 @@ def line() -> int:
 
 def peek() -> str:
     global scanner
-    if at_end(): return Token(TokenKind.EOF, "EOF", None, 0)
     return scanner.source[scanner.index]
 
 def at_end() -> bool:
@@ -220,5 +219,6 @@ def advance() -> str:
     return char
 
 if __name__ == "__main__":
-    tokens: list[Token] = scan(read_file("tests/00-scanner-test.txt"))
+    #tokens: list[Token] = scan(read_file("tests/00-scanner-test.txt"))
+    tokens: list[Token] = scan(read_file("tests/01-expr.flox"))
     [ print(tok) for tok in tokens]

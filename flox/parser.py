@@ -29,7 +29,27 @@ def parse(tokens: list[Token]) -> list[Expr]:
 def parse_declaration() -> Expr:
     if matches(TokenKind.COMMENT):
         return None
+    if matches(TokenKind.VAR):
+        return parse_variable_declaration()
     return parse_expression_statement()
+
+def parse_variable_declaration() -> Expr:
+    # "var" IDENT ("=" Expr)? ";"
+
+    if check(TokenKind.IDENT) is False:
+        print(f"[parser-error] missing variable identifier in variable declaration on line {peek().line}.")
+        exit(1)
+
+    name: Variable  = parse_primary()
+
+    value: Expr = None
+    if matches(TokenKind.EQUAL):
+        value = parse_expression()
+
+    vardec = VarDec(name, value)
+    consume(TokenKind.SEMI,
+            f"missing ';' after variable declaration on line {name.token.line}.")
+    return vardec
 
 def parse_expression_statement() -> Expr:
     line_start = peek().line
@@ -39,7 +59,21 @@ def parse_expression_statement() -> Expr:
     return expr
 
 def parse_expression() -> Expr:
-    return parse_term()
+    return parse_assignment()
+
+def parse_assignment() -> Expr:
+    # Assign(Variable(a), Expr)
+    # a = 10;
+
+    name: Expr = parse_term()
+
+    if matches(TokenKind.EQUAL) is False:
+        return name
+
+    value: Expr = parse_expression()
+
+    return Assign(name, value)
+
 
 def parse_term() -> Expr:
     left: Expr = parse_fact()
@@ -74,6 +108,8 @@ def parse_grouping() -> Expr:
 def parse_primary() -> Expr:
     if matches(TokenKind.NUMBER):
         return Literal(prev())
+    if matches(TokenKind.IDENT):
+        return Variable(prev())
     
     raise Exception(f"[parser-error] unimplemented token: '{peek().lexeme}'")
 

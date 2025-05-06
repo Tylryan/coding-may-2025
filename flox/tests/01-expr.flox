@@ -1,8 +1,14 @@
-// My single line comment
-
-/* My multiline comment
- * starting her eright
- * now
+/* Here is a description of this code.
+ * it spans multiple lines
  */
-(1.0 + 2.0) * 10.0 % 5.0 / 2.5;
-1 + 2;
+var a = 1;
+
+{
+    a = 50;
+    print(a);
+    var b = 10;
+}
+
+print(a);
+
+// hsadfalsdkfjas;lkfjas;ldkfjasd;lfkj
