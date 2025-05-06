@@ -2,23 +2,29 @@ from __future__ import annotations
 
 
 from exprs import *
-
-global globals
-globals = {}
+from lox_env import Env
 
 class Interpreter:
+    env: Env
     index: int
     exprs: list[Expr]
 
+    def __init__(self, exprs: list[Expr]):
+        self.env = Env(None)
+        self.index = 0
+        self.exprs = exprs
 
+global interpreter
 def interpret(exprs: list[Expr]) -> None:
+    global interpreter
+    interpreter = Interpreter(exprs)
 
-    for expr in exprs:
+    for expr in interpreter.exprs:
         thing: object = evaluate(expr)
         print(thing)
 
     print("ENV")
-    print(globals)
+    print(interpreter.env.symbol_table)
 
 def evaluate(expr: Expr) -> object:
     if isinstance(expr, Literal)   : return eval_literal(expr)
@@ -28,18 +34,19 @@ def evaluate(expr: Expr) -> object:
     elif isinstance(expr, Variable): return eval_variable(expr)
 
     else:
-        print(f"[interpreter-error] unimplemented expression:\n{expr.to_dict()}")
+        print(f"[interpreter-error] unimplemented expression:"
+              f"\n{expr.to_dict()}")
         exit(1)
 
 def eval_variable(variable: Variable) -> object:
-    global globals
-    return globals[variable.token.lexeme]
+    global interpreter
+    return interpreter.env.get(variable.token)
 
 def eval_variable_declaration(vardec: VarDec) -> object:
-    global globals
+    global interpreter
     # 1. Save name in interpreter world
     # 2. Map value to name
-    globals[vardec.name.token.lexeme] = evaluate(vardec.value)
+    interpreter.env.define(vardec.name.token,  evaluate(vardec.value))
 
 def eval_literal(expr: Literal) -> object:
     return expr.token.value
@@ -49,20 +56,15 @@ def eval_grouping(expr: Grouping) -> object:
 
 def eval_binary(expr: Binary) -> object:
     # TODO(tyler): Will change to Expr
-    left: float  = evaluate(expr.left)
+    left : float = evaluate(expr.left)
     right: float = evaluate(expr.right)
     op = expr.op
 
-    if op.lexeme == "+":
-        return left + right
-    elif op.lexeme == "-":
-        return left - right
-    elif op.lexeme == "*":
-        return left * right
-    elif op.lexeme == "/":
-        return left / right
-    elif op.lexeme == "%":
-        return left % right
+    if   op.lexeme == "+": return left + right
+    elif op.lexeme == "-": return left - right
+    elif op.lexeme == "*": return left * right
+    elif op.lexeme == "/": return left / right
+    elif op.lexeme == "%": return left % right
     else:
         print(f"[interpreter-error] unimplemented operator: '{op.lexeme}'")
         exit(1)
