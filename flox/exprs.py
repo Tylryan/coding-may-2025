@@ -79,3 +79,12 @@ class Environ(Expr):
 
     def to_dict(self) -> dict[str, object]:
         return { "env": None }
+
+@dataclass
+class Block(Expr):
+    exprs: list[Expr]
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "block": [expr.to_dict() for expr in self.exprs]
+        }
