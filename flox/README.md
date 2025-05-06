@@ -119,21 +119,25 @@ fun main() {
 // by default.
 struct Person { name, age };
 
+
 // However, if you wanted to define your own 
 // initializer, you could use a static method.
 // Note the implicit return.
-fun Person::new(name, age) { Person(name, age) }
-fun Person::from(tuple) {
-        name = tuple.get(0);
-        age = tuple.get(1);
-
-        Person(name, age);
-}
 
 // Methods can be added to structs at any
 // point in the program. This idea came from
 // traits in Rust.
 extend Person {
+        fun Self::new(name, age) { 
+                return Person(name, age);
+        }
+        fun Self::from(tuple) {
+                name = tuple.get(0);
+                age = tuple.get(1);
+
+                Person(name, age);
+        }
+
         fun greet(self, other) {
                 print($format("Hello '{other.name}', my name is '{self.name}'." ));
         }
@@ -146,10 +150,15 @@ extend Person {
 }
 
 fun main() {
+        // Instantiating a new 'person' using
+        // the default initializer.
         me  = Person("Me", 1000);
+        // The same thing but using a custom
+        // initializer.
         you = Person::new("You", 10001);
 
-        me.greet(you);            // "Hello 'You', my name is 'Me'.
+        // "Hello 'You', my name is 'Me'.
+        me.greet(you);            
         Person::compare(me, you); // -1
 }
 ```
@@ -203,9 +212,9 @@ fun main() {
         // OUTPUT
         //{
         //        "binary-expr": {
-        //                "left" : 1,
+        //                "left" : literal : { 1 },
         //                "op"   : "+",
-        //                "right": 2
+        //                "right": literal : { 2 }
         //        }
         //}
 }
