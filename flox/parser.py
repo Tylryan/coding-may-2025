@@ -55,11 +55,21 @@ def parse_variable_declaration() -> Expr:
 
 def parse_expression_statement() -> Expr:
     line_start = peek().line
+    if matches(TokenKind.ENV):
+        return parse_env()
+
     expr: Expr = parse_expression()
     consume(TokenKind.SEMI, 
             f"missing ';' after expression statement around line "
             f"{line_start}.")
     return expr
+
+def parse_env() -> Expr:
+    # "env" ";"
+    keyword: Token = peek()
+    consume(TokenKind.SEMI,
+            f"missing ';' after 'env' on line {keyword.line}.")
+    return Environ(keyword)
 
 def parse_expression() -> Expr:
     return parse_assignment()
