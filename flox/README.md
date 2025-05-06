@@ -21,6 +21,19 @@ fun fact(n) {
 }
 ```
 
+## Current Design Notes
+### Implicit Returns
+Pretty much anything that isn't a declaration (var, fun) returns
+a value. This means blocks even return values. More specifically,
+they return the value of the last evaluated expression.
+```js
+// 'a' == 1 because the last evaluated expression is '1'.
+var a = { 1 };
+// 'b' == 2 because the last evaluated expression in the
+// block expression is '2'.
+var b = { 1; 2 };
+```
+
 ## Some Interesting Ideas
 ### Preprocessor Work and Macros
 I'm thinking of a preprocessor with it's own mini language that will 

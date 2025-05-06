@@ -57,6 +57,7 @@ def parse_expression_statement() -> Expr:
     line_start = peek().line
     if matches(TokenKind.ENV):
         return parse_env()
+    
 
 
     expr: Expr = parse_expression()
@@ -100,7 +101,51 @@ def parse_env() -> Expr:
 def parse_expression() -> Expr:
     if matches(TokenKind.LBRACE):
         return parse_block()
-    return parse_assignment()
+    if matches(TokenKind.IF):
+        return parse_if()
+    return parse_comparison()
+
+def parse_comparison() -> Expr:
+    left: Expr = parse_assignment()
+
+
+    while matches(TokenKind.EQUAL_EQUAL,
+                  TokenKind.LESS,
+                  TokenKind.LESS_EQUAL,
+                  TokenKind.GREATER,
+                  TokenKind.GREATER_EQUAL,
+                  TokenKind.BANG_EQUAL):
+        op   : Token = prev()
+        right: Expr = parse_assignment()
+        left = Binary(left, op, right)
+
+    return left
+
+
+def parse_if() -> Expr:
+    # "if" "(" CondExpr ")" ThenExpr ("else" ElseExpr)?
+    # assuming we're on Expr
+    line_start: int = peek().line
+
+    consume(TokenKind.LPAR,
+            f"missing '(' in if expression around line {line_start}")
+        
+    predicate: Expr = parse_expression()
+    print(predicate.to_dict())
+    exit(1)
+
+    consume(TokenKind.RPAR,
+            f"missing ')' in if expression around line {line_start}")
+
+    then_branch: Expr = parse_expression()
+
+    else_branch: Expr = None
+    if matches(TokenKind.ELSE):
+        else_branch = parse_expression()
+
+    return If(predicate, then_branch, else_branch)
+
+
 
 def parse_assignment() -> Expr:
     # Assign(Variable(a), Expr)

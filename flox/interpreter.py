@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 
+from tokens import Token, TokenKind
 from exprs import *
 from lox_env import Env
 
@@ -92,6 +93,13 @@ def eval_binary(expr: Binary) -> object:
     elif op.lexeme == "*": return left * right
     elif op.lexeme == "/": return left / right
     elif op.lexeme == "%": return left % right
+
+    elif op.kind == TokenKind.EQUAL_EQUAL  : return left == right
+    elif op.kind == TokenKind.LESS         : return left < right
+    elif op.kind == TokenKind.LESS_EQUAL   : return left <= right
+    elif op.kind == TokenKind.GREATER      : return left > right
+    elif op.kind == TokenKind.GREATER_EQUAL: return left >= right
+    elif op.kind == TokenKind.BANG_EQUAL   : return left != right
     else:
         print(f"[interpreter-error] unimplemented operator: '{op.lexeme}'")
         exit(1)

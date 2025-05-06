@@ -98,3 +98,10 @@ class Null(Expr):
     
     def to_dict(self) -> dict[str, object]:
         return {"null": None}
+    
+
+@dataclass
+class If(Expr):
+    predicate: Expr
+    then_branch: Expr
+    else_branch: Expr
