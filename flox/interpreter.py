@@ -10,7 +10,6 @@ class Interpreter:
     index: int
     exprs: list[Expr]
 
-
 def interpret(exprs: list[Expr]) -> None:
 
     for expr in exprs:
@@ -28,7 +27,8 @@ def evaluate(expr: Expr) -> object:
     elif isinstance(expr, Variable): return eval_variable(expr)
 
     else:
-        print(f"[interpreter-error] unimplemented expression:\n{expr.to_dict()}")
+        print(f"[interpreter-error] unimplemented expression:"
+              f"\n{expr.to_dict()}")
         exit(1)
 
 def eval_variable(variable: Variable) -> object:
@@ -49,20 +49,15 @@ def eval_grouping(expr: Grouping) -> object:
 
 def eval_binary(expr: Binary) -> object:
     # TODO(tyler): Will change to Expr
-    left: float  = evaluate(expr.left)
+    left : float = evaluate(expr.left)
     right: float = evaluate(expr.right)
     op = expr.op
 
-    if op.lexeme == "+":
-        return left + right
-    elif op.lexeme == "-":
-        return left - right
-    elif op.lexeme == "*":
-        return left * right
-    elif op.lexeme == "/":
-        return left / right
-    elif op.lexeme == "%":
-        return left % right
+    if   op.lexeme == "+": return left + right
+    elif op.lexeme == "-": return left - right
+    elif op.lexeme == "*": return left * right
+    elif op.lexeme == "/": return left / right
+    elif op.lexeme == "%": return left % right
     else:
         print(f"[interpreter-error] unimplemented operator: '{op.lexeme}'")
         exit(1)
