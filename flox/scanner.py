@@ -52,7 +52,6 @@ def scan(source: str) -> list[Token]:
         elif char == ";"   : tokens.append(Token(TokenKind.SEMI  , advance(), None, line()))
         elif char == ","   : tokens.append(Token(TokenKind.COMMA , advance(), None, line()))
         elif char == "."   : tokens.append(Token(TokenKind.DOT   , advance(), None, line()))
-        elif char == "/"   : handle_slash(tokens)
         elif char == "="   : handle_equal(tokens)
         elif char == "<"   : handle_less(tokens)
         elif char == ">"   : handle_greater(tokens)
@@ -60,6 +59,7 @@ def scan(source: str) -> list[Token]:
         elif char.isdigit(): handle_digit(tokens)
         elif char.isalpha(): handle_alpha(tokens)
         elif char == "\""  : handle_string(tokens)
+        elif char == "/"   : handle_slash(tokens)
         else:
             print(f"[scanner-error] unimplemented character: "
                   f"'{peek()}'")
@@ -205,8 +205,9 @@ def handle_slash(tokens: list[Token]) -> None:
         while at_end() is False and peek() != "\n":
             comment+= advance()
 
-        comment+= advance()
-        new_line()
+        if at_end() is False:
+            comment+= advance()
+            new_line()
 
         tokens.append(Token(TokenKind.COMMENT, 
                                    comment, comment, line))
