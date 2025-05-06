@@ -72,3 +72,10 @@ class Assign(Expr):
             "value" : self.value.to_dict(),
             }
         }
+
+@dataclass
+class Environ(Expr):
+    token: Token
+
+    def to_dict(self) -> dict[str, object]:
+        return { "env": None }

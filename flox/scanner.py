@@ -19,6 +19,7 @@ class Scanner:
         "return"  : lambda line_no: Token(TokenKind.RETURN  , "return"   , None , line_no),
         "break"   : lambda line_no: Token(TokenKind.BREAK   , "break"    , None , line_no),
         "continue": lambda line_no: Token(TokenKind.CONTINUE, "continue" , None , line_no),
+        "env"     : lambda line_no: Token(TokenKind.ENV     , "env"      , None , line_no),
     }
 
     def __init__(self, source: str):

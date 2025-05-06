@@ -21,10 +21,6 @@ def interpret(exprs: list[Expr]) -> None:
 
     for expr in interpreter.exprs:
         thing: object = evaluate(expr)
-        print(thing)
-
-    print("ENV")
-    print(interpreter.env.symbol_table)
 
 def evaluate(expr: Expr) -> object:
     if isinstance(expr, Literal)   : return eval_literal(expr)
@@ -32,11 +28,18 @@ def evaluate(expr: Expr) -> object:
     elif isinstance(expr, Grouping): return eval_grouping(expr)
     elif isinstance(expr, VarDec)  : return eval_variable_declaration(expr)
     elif isinstance(expr, Variable): return eval_variable(expr)
+    elif isinstance(expr, Environ) : return eval_environ(expr)
 
     else:
         print(f"[interpreter-error] unimplemented expression:"
               f"\n{expr.to_dict()}")
         exit(1)
+
+def eval_environ(env: Environ) -> object:
+    global interpreter
+    symbol_table = interpreter.env.symbol_table
+    print(symbol_table)
+    return symbol_table
 
 def eval_variable(variable: Variable) -> object:
     global interpreter
