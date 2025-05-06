@@ -5,7 +5,10 @@ being an Expression.
 
 ```js
 var a = 0;
-var b = 1;
+// Blocks return the last evaluated expression.
+// In this case, 'b' is equal to 1.
+var b = { 1 };
+// 'c' == "YEP"
 var c = if (a)      { "NOPE" }
         else if (b) { "YEP"  }
         else        { "NOPE" };
