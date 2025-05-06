@@ -58,12 +58,38 @@ def parse_expression_statement() -> Expr:
     if matches(TokenKind.ENV):
         return parse_env()
 
+
     expr: Expr = parse_expression()
-    consume(TokenKind.SEMI, 
-            f"missing ';' after expression statement around line "
-            f"{line_start}.")
+
+    # NOTE(tyler): I'm thinking about getting rid of
+    # this concept entirely and delegating the semicolon
+    # check to the declarations or other expressions that
+    # require them.
+    # I would simply move expression_statement and just use
+    # expression()
+    if matches(TokenKind.SEMI): pass
+    # consume(TokenKind.SEMI, 
+    #         f"missing ';' after expression statement around line "
+    #         f"{line_start}.")
     return expr
 
+def parse_block() -> Block:
+    # Block := "{" EXPR+ "}" ;
+    # assumes left brace is already matched.
+
+    line_no = prev().line
+    exprs: list[Expr] = []
+
+    while at_end() is False and check(TokenKind.RBRACE) is False:
+        expr = parse_declaration()
+        exprs.append(expr)
+
+    consume(TokenKind.RBRACE,
+            f"missing '}}' in block expression on beginning on line {line_no}.")
+
+    return Block(exprs)
+
+# NOTE: This is really more like a statement 
 def parse_env() -> Expr:
     # "env" ";"
     keyword: Token = peek()
@@ -72,6 +98,8 @@ def parse_env() -> Expr:
     return Environ(keyword)
 
 def parse_expression() -> Expr:
+    if matches(TokenKind.LBRACE):
+        return parse_block()
     return parse_assignment()
 
 def parse_assignment() -> Expr:

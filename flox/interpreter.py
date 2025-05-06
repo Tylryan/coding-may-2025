@@ -20,20 +20,44 @@ def interpret(exprs: list[Expr]) -> None:
     interpreter = Interpreter(exprs)
 
     for expr in interpreter.exprs:
-        thing: object = evaluate(expr)
+        evaluate(expr)
 
 def evaluate(expr: Expr) -> object:
-    if isinstance(expr, Literal)   : return eval_literal(expr)
+    if expr is None                : return Null()
+    elif isinstance(expr, Literal) : return eval_literal(expr)
     elif isinstance(expr, Binary)  : return eval_binary(expr)
     elif isinstance(expr, Grouping): return eval_grouping(expr)
     elif isinstance(expr, VarDec)  : return eval_variable_declaration(expr)
     elif isinstance(expr, Variable): return eval_variable(expr)
     elif isinstance(expr, Environ) : return eval_environ(expr)
+    elif isinstance(expr, Block)   : return eval_block(expr, Env(interpreter.env))
+    elif isinstance(expr, Assign)  : return eval_assign(expr)
 
     else:
         print(f"[interpreter-error] unimplemented expression:"
               f"\n{expr.to_dict()}")
         exit(1)
+
+
+def eval_assign(expr: Assign) -> object:
+    val: object = evaluate(expr.value)
+    interpreter.env.assign(expr.name.token, val)
+    return val
+
+def eval_block(block: Block, new_env: Env) -> object:
+    """Blocks should return the last the object of the
+    last evaluated"""
+    previous = interpreter.env
+
+    last_object = Null()
+    try:
+        interpreter.env = new_env
+        for expr in block.exprs:
+            last_object = evaluate(expr)
+    finally:
+        interpreter.env = previous
+
+    return last_object
 
 def eval_environ(env: Environ) -> object:
     global interpreter
