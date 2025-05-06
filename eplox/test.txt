@@ -1,0 +1,12 @@
+
+var a = 1;
+fun print() {
+    var c = a;
+    env;
+}
+
+{
+    var a = 2;
+    print();
+    env;
+}

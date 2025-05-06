@@ -5,6 +5,15 @@ from tokens import Token
 class Expr:
     kind: str = "Expr"
 
+# Just to debug the environment
+def env_init():
+    expr = Expr()
+    expr.kind = "Env"
+    return expr
+
+def is_env(expr: Expr):
+    return expr.kind == "Env"
+
 def call_init(callee: Expr, paren: Token, arguments: list[Expr]) -> Expr:
     assert isinstance(callee, Expr)
     assert isinstance(paren, Token)
@@ -46,10 +55,10 @@ def variable_init(token: Token) -> Expr:
 
 def grouping_init(expr: Expr) -> Expr:
     assert isinstance(expr, Expr)
-    expr             = Expr()
-    expr.kind        = "Grouping"
-    expr.expression  = expr
-    return expr
+    grouping             = Expr()
+    grouping.kind        = "Grouping"
+    grouping.expression  = expr
+    return grouping
 
 def unary_init(operator: Token, right: Expr) -> Expr:
     assert isinstance(operator, Token)
@@ -147,29 +156,22 @@ def is_expr(expr: Expr) -> bool:
 def expr_to_str(expr: Expr) -> str:
     assert isinstance(expr, Expr)
 
-    if is_lit(expr):
-        return lit_to_str(expr)
-    elif is_binop(expr):
-        return binop_to_str(expr)
-    elif is_unary(expr):
-        return unary_to_str(expr)
-    elif is_grouping(expr):
-        return grouping_to_str(expr)
-    elif is_call(expr):
-        return call_to_str(expr)
-    elif is_assign(expr):
-        return assign_to_str(expr)
-    elif is_variable(expr):
-        return variable_to_str(expr)
-    elif is_logical(expr):
-        return logical_to_str(expr)
-    elif is_expr(expr):
-        return expr_to_str(expr)
+    if is_lit(expr)        : return lit_to_str(expr)
+    elif is_binop(expr)    : return binop_to_str(expr)
+    elif is_unary(expr)    : return unary_to_str(expr)
+    elif is_grouping(expr) : return grouping_to_str(expr)
+    elif is_call(expr)     : return call_to_str(expr)
+    elif is_assign(expr)   : return assign_to_str(expr)
+    elif is_variable(expr) : return variable_to_str(expr)
+    elif is_logical(expr)  : return logical_to_str(expr)
+    elif expr.kind == "Env": return "Env"
+    elif is_expr(expr)     : return "Expr()"
 
     try:
-        print(f"Unimplemented expression: ", expr.kind)
+        print(f"[exprs-error] Unimplemented expression: ", expr.kind)
+        exit(1)
     except Exception:
-        print(f"[error] passed the wrong type. expected `expr`, found {type(expr)}")
+        print(f"[exprs-error] passed the wrong type. expected `expr`, found {type(expr)}")
         exit(1)
 
 # Call logical assign variable
@@ -219,10 +221,6 @@ def lit_to_str(lit_expr: Expr) -> str:
     assert isinstance(lit_expr, Expr)
 
     return str(lit_expr.tok.literal)
-
-def expr_to_str(expr: Expr) -> str:
-    assert isinstance(expr, Expr)
-    return "Expr()"
 
 
 if __name__ == "__main__":
