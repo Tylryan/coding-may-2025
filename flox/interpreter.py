@@ -4,6 +4,26 @@ from __future__ import annotations
 from tokens import Token, TokenKind
 from exprs import *
 from lox_env import Env
+from flox_exceptions import FloxReturn
+
+@dataclass
+class FloxFun:
+    fun_dec: FunDec
+    closure: Env
+
+    def arity(self) -> int:
+        return len(self.fun_dec.params)
+
+    def call(self, args: list[object]) -> object:
+        env = Env(self.closure)
+
+        for i, param in enumerate(self.fun_dec.params):
+            env.define(param.token, args[i])
+
+        try:
+            eval_block(self.fun_dec.body, env)
+        except FloxReturn as fr:
+            return fr.value
 
 class Interpreter:
     env: Env
@@ -34,12 +54,39 @@ def evaluate(expr: Expr) -> object:
     elif isinstance(expr, Block)   : return eval_block(expr, Env(interpreter.env))
     elif isinstance(expr, Assign)  : return eval_assign(expr)
     elif isinstance(expr, If)      : return eval_if(expr)
+    elif isinstance(expr, Return)  : return eval_return(expr)
+    elif isinstance(expr, FunDec)  : return eval_fun_declaration(expr)
+    elif isinstance(expr, FunCall) : return eval_fun_call(expr)
 
     else:
         print(f"[interpreter-error] unimplemented expression:"
               f"\n{expr.to_dict()}")
         exit(1)
 
+
+def eval_fun_call(expr: FunCall) -> object:
+    callee: object = evaluate(expr.name)
+
+    if isinstance(callee, FloxFun) is False:
+        print(f"[interpreter-error] uncallable object "
+              f"'{expr.name.token.lexeme}' on line {expr.name.token.line}.")
+        exit(1)
+
+    args: list[object] = []
+    for arg in expr.args:
+        obj: object = evaluate(arg)
+        args.append(obj)
+    
+    return callee.call(args)
+
+
+def eval_return(ret: Return) -> object:
+    raise FloxReturn(evaluate(ret.value))
+
+def eval_fun_declaration(fun: FunDec) -> None:
+    flox_fun = FloxFun(fun, interpreter.env)
+    interpreter.env.define(fun.name.token, flox_fun)
+    return None
 
 def eval_if(expr: If) -> object:
     if evaluate(expr.predicate):
@@ -53,6 +100,7 @@ def eval_assign(expr: Assign) -> object:
     return val
 
 def eval_block(block: Block, new_env: Env) -> object:
+    assert isinstance(block, Block)
     """Blocks should return the last the object of the
     last evaluated"""
     previous = interpreter.env
@@ -70,7 +118,8 @@ def eval_block(block: Block, new_env: Env) -> object:
 def eval_environ(env: Environ) -> object:
     global interpreter
     symbol_table = interpreter.env.symbol_table
-    print(symbol_table)
+    from pprint import pprint
+    pprint(symbol_table)
     return symbol_table
 
 def eval_variable(variable: Variable) -> object:

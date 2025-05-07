@@ -113,3 +113,52 @@ class If(Expr):
             "else-branch": self.else_branch.to_dict() if self.else_branch \
                                                       else Null().to_dict()
         }}
+
+@dataclass
+class FunDec(Expr):
+    name  : Variable
+    params: list[Variable]
+    body  : Expr
+
+
+    def to_dict(self) -> dict[str, object]:
+        parameters: list[dict] = []
+        for param in self.params:
+            parameters.append(param.to_dict())
+
+        return {
+            "function": {
+                "name"  : self.name.to_dict(),
+                "params": parameters,
+                "body"  : self.body.to_dict()
+            }
+        }
+
+@dataclass
+class Return(Expr):
+    token: Token
+    value: Expr
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "return": {
+                "value" : self.value.to_dict() if self.value else Null().to_dict()
+            }
+        }
+
+@dataclass
+class FunCall(Expr):
+    name: Variable
+    args: list[Expr]
+
+    def to_dict(self) -> dict[str, object]:
+        args: list[Expr] = []
+        for arg in self.args:
+            args.append(arg.to_dict())
+
+        return {
+            "fun-call": {
+                "name": self.name.to_dict(),
+                "args": args
+            }
+        }
