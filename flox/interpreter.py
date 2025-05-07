@@ -28,19 +28,23 @@ def interpret(exprs: list[Expr]) -> None:
         evaluate(expr)
 
 def evaluate(expr: Expr) -> object:
-    if expr is None                : return Null()
-    elif isinstance(expr, Literal) : return eval_literal(expr)
-    elif isinstance(expr, Binary)  : return eval_binary(expr)
-    elif isinstance(expr, Grouping): return eval_grouping(expr)
-    elif isinstance(expr, VarDec)  : return eval_variable_declaration(expr)
-    elif isinstance(expr, Variable): return eval_variable(expr)
-    elif isinstance(expr, Environ) : return eval_environ(expr)
-    elif isinstance(expr, Block)   : return eval_block(expr, Env(interpreter.env))
-    elif isinstance(expr, Assign)  : return eval_assign(expr)
-    elif isinstance(expr, If)      : return eval_if(expr)
-    elif isinstance(expr, Return)  : return eval_return(expr)
-    elif isinstance(expr, FunDec)  : return eval_fun_declaration(expr)
-    elif isinstance(expr, FunCall) : return eval_fun_call(expr)
+    if expr is None                 : return None
+    elif isinstance(expr, Literal)  : return eval_literal(expr)
+    elif isinstance(expr, Binary)   : return eval_binary(expr)
+    elif isinstance(expr, Grouping) : return eval_grouping(expr)
+    elif isinstance(expr, VarDec)   : return eval_variable_declaration(expr)
+    elif isinstance(expr, Variable) : return eval_variable(expr)
+    elif isinstance(expr, Environ)  : return eval_environ(expr)
+    elif isinstance(expr, Block)    : return eval_block(expr, Env(interpreter.env))
+    elif isinstance(expr, Assign)   : return eval_assign(expr)
+    elif isinstance(expr, If)       : return eval_if(expr)
+    elif isinstance(expr, Return)   : return eval_return(expr)
+    elif isinstance(expr, FunDec)   : return eval_fun_declaration(expr)
+    elif isinstance(expr, FunCall)  : return eval_fun_call(expr)
+    elif isinstance(expr, FloxTrue) : return True
+    elif isinstance(expr, FloxFalse): return False
+    elif isinstance(expr, Null)     : return None
+
 
     else:
         print(f"[interpreter-error] unimplemented expression:"

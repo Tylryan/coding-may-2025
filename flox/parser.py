@@ -268,12 +268,13 @@ def parse_fun_call() -> Expr:
 
 
 def parse_primary() -> Expr:
-    if matches(TokenKind.NUMBER):
-        return Literal(prev())
-    if matches(TokenKind.IDENT):
-        return Variable(prev())
-    if matches(TokenKind.STRING):
-        return Literal(prev())
+    if matches(TokenKind.NUMBER): return Literal(prev())
+    if matches(TokenKind.STRING): return Literal(prev())
+    if matches(TokenKind.TRUE)  : return FloxTrue(prev())
+    if matches(TokenKind.FALSE) : return FloxFalse(prev())
+    if matches(TokenKind.NULL)  : return Null(prev())
+
+    if matches(TokenKind.IDENT) : return Variable(prev())
     
     raise Exception(f"[parser-error] unimplemented token: "
                     f"'{peek().lexeme}'")

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from tokens import Token
+from tokens import Token, fake_token
 
 class Expr:
 
@@ -93,11 +93,6 @@ class Block(Expr):
 
         return { "block": inner }
 
-@dataclass
-class Null(Expr):
-    
-    def to_dict(self) -> dict[str, object]:
-        return {"null": None}
     
 
 @dataclass
@@ -162,3 +157,29 @@ class FunCall(Expr):
                 "args": args
             }
         }
+
+@dataclass
+class FloxTrue:
+    token: Token
+
+    def to_dict(self) -> dict[str, object]:
+        return "true"
+
+@dataclass
+class FloxFalse:
+    token: Token
+
+    def to_dict(self) -> dict[str, object]:
+        return "false"
+
+class Null(Expr):
+    token: Token
+
+    def __init__(self, token: Token = None):
+        if token:
+            self.token = token
+        else:
+            self.token = fake_token()
+    
+    def to_dict(self) -> dict[str, object]:
+        return "null"

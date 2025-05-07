@@ -60,5 +60,5 @@ class Token:
     value : object
     line  : int
 
-def fake_token(lexeme: str, value: object = None) -> Token:
+def fake_token(lexeme: str = None, value: object = None) -> Token:
     return Token(TokenKind.__NONE__, lexeme, value, -1)
