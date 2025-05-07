@@ -36,5 +36,5 @@ class Env:
             return self.parent.get(name)
         
         print(f"[environment-error] undefined variable "
-              f"'{self.name.lexeme}' on line {self.name.line}.")
+              f"'{name.lexeme}' on line {name.line}.")
         exit(1)

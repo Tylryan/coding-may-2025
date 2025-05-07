@@ -15,6 +15,14 @@ fun curry(f) {
 fun main(a) {
 	var my_print = curry(print);
 	my_print("Hello, World");
+	var a = List(1,2,3);
+	print(a);
+
+	var b = head(a);
+	print(b);
+
+
+
 }
 
 main(1);
