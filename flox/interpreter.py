@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 
-from tokens import Token, TokenKind, fake_token
+from tokens import Token, TokenKind
 from exprs import *
 from lox_env import Env
 from flox_exceptions import FloxReturn
 from flox_fun import FloxFun, FloxCallable
-from ffi.py_print import PythonPrint
+from ffi import *
 
 class Interpreter:
     env: Env
@@ -22,7 +22,7 @@ global interpreter
 def interpret(exprs: list[Expr]) -> None:
     global interpreter
     interpreter = Interpreter(exprs)
-    interpreter.env.define(fake_token("print"), PythonPrint())
+    load_ffis(interpreter.env)
 
     for expr in interpreter.exprs:
         evaluate(expr)

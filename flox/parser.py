@@ -272,6 +272,8 @@ def parse_primary() -> Expr:
         return Literal(prev())
     if matches(TokenKind.IDENT):
         return Variable(prev())
+    if matches(TokenKind.STRING):
+        return Literal(prev())
     
     raise Exception(f"[parser-error] unimplemented token: "
                     f"'{peek().lexeme}'")
@@ -313,7 +315,7 @@ def at_end() -> bool:
 
 if __name__ == "__main__":
     from scanner import scan
-    tokens: list[Token] = scan(read_file("tests/01-expr.flox"))
+    tokens: list[Token] = scan(read_file("tests/main.flox"))
     exprs: list[Expr] = parse(tokens)
 
     from pprint import pprint

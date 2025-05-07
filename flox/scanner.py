@@ -144,7 +144,13 @@ def handle_alpha(tokens: list[Token]) -> None:
     line_no = line()
     string = advance()
 
-    while at_end() is False and peek().isalnum():
+    def is_char(c: str) -> bool:
+        other = [
+            c == "_"
+        ]
+        return (c.isalnum() or any(other))
+
+    while at_end() is False and is_char(peek()):
         string += advance()
         if string in scanner.keywords.keys():
             tokens.append(scanner.keywords[string](line()))

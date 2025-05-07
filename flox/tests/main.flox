@@ -1,3 +1,4 @@
 
-var a = 10;
-print(a);
+
+var file_str = read_file("exprs.py", "r");
+print(file_str);
