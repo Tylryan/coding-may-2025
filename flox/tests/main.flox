@@ -10,6 +10,8 @@ fun curry(f) {
 	return f_;
 }
 
+
+
 /* TODO(tyler): a function with no parameters 
  * crashes when called. */
 fun main(a) {
@@ -19,10 +21,9 @@ fun main(a) {
 	print(a);
 
 	var b = head(a);
+	var c = tail(a);
 	print(b);
-
-
-
+	print(c);
 }
 
 main(1);

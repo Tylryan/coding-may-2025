@@ -13,3 +13,4 @@ def load_ffis(env: Env):
     env.define(fake_token("read_file"), PythonReadFile())
     env.define(fake_token("List"), List())
     env.define(fake_token("head"), Head())
+    env.define(fake_token("tail"), Tail())
