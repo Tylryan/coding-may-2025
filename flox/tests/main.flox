@@ -1,4 +1,20 @@
 
+fun curry(f) {
+	/* TODO(tyler): '_f' is currently not
+	 * allowed as an identifier as the scanner
+	 * doesn't pick up the preceding '_'. */
+	fun f_(arg) {
+		f(arg);
+		return null;
+	}
+	return f_;
+}
 
-var file_contents = read_file("exprs.py", "r");
-print(file_contents);
+/* TODO(tyler): a function with no parameters 
+ * crashes when called. */
+fun main(a) {
+	var my_print = curry(print);
+	my_print("Hello, World");
+}
+
+main(1);
