@@ -193,7 +193,7 @@ struct Binary  {
 
 extend Literal {
         fun as_map(self) -> HashMap[str, object] { 
-                hm: HashMap::new();
+                var hm = HashMap::new();
                 hm.put("literal", self.token.value);
                 return hm
         }
@@ -201,8 +201,8 @@ extend Literal {
 
 extend Binary {
         fun as_map(self) -> HashMap[str, object] { 
-                binary_expr: HashMap::new();
-                inner: HashMap::new();
+                var binary_expr =  HashMap::new();
+                var inner: HashMap::new();
 
                 inner.put("left", self.left.as_map());
                 inner.put("op", self.op);
@@ -235,4 +235,50 @@ fun main() {
         //}
 }
 
+```
+
+### Reference Counting
+At some point, I'd like to learn about Garbage Collection and I think the simplest
+place to start is Reference Counting.
+
+The MVP would be a language that had no GC by default and manual reference counting.
+#### Manual Reference Counting
+```rs
+fun create_person(name: str) -> Rc[Person] {
+        return Rc::track(Person(name));
+}
+
+fun main() {
+
+        person: Rc[Person] = create_person("Me");
+        other_person: Rc[Person] = create_person("You");
+
+        // Creates a reference cycle
+        person.friends.push(other_person);
+        Rc::add_ref(other_person)
+
+
+        // ... Other stuff ...
+
+        // Eventually will be freed when ref_count == 0
+        Rc::remove_ref(other_person);
+        Rc::remove_ref(person);
+
+        // Or free quickly if you no
+        // longer need it.
+        Rc::free(person);
+}
+```
+
+#### Automatic Reference Counting
+
+```rs
+Arc::remove();
+Arc::ref_count();
+Arc::strong();  // Same thing as Arc::track()
+Arc::ref();
+Arc::free();
+// Eventually we'll need to detect cycles like the one 
+// above.
+Arc::weak();
 ```
