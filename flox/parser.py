@@ -249,7 +249,7 @@ def parse_fun_call() -> Expr:
     args: list[Expr]  = []
     if matches(TokenKind.LPAR):
         while True:
-            if matches(TokenKind.RPAR):
+            if check(TokenKind.RPAR):
                 break
 
             expr: Expr = parse_expression()

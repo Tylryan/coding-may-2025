@@ -3,35 +3,63 @@ This language will basically be Lox (Crafting Interpreters), but with most every
 being an Expression.
 
 
-```js
-var a = 0;
-// Blocks return the last evaluated expression.
-// In this case, 'b' is equal to 1.
-var b = { 1 };
-// 'c' == "YEP"
-var c = if (a)      { "NOPE" }
-        else if (b) { "YEP"  }
-        else        { "NOPE" };
+```rs
 
-fun fact(n) {
-        if (n <= 1 ) { 1 }
-        // Implicit return where
-        // "return" is optional.
-        5 * fib(n - 1)
+fun map(fn, xs) { 
+	fun map__(ys, res) {
+		if (len(ys) == 0) {
+			return res;
+		}
+		var got_got = fn(head(ys));
+		return map__(tail(ys), append(got_got, res));
+	}
+
+	return map__(xs, List());
 }
-```
 
-## Current Design Notes
-### Implicit Returns
-Pretty much anything that isn't a declaration (var, fun) returns
-a value. This means blocks even return values. More specifically,
-they return the value of the last evaluated expression.
-```js
-// 'a' == 1 because the last evaluated expression is '1'.
-var a = { 1 };
-// 'b' == 2 because the last evaluated expression in the
-// block expression is '2'.
-var b = { 1; 2 };
+fun filter(fn, xs) {
+	fun filter__(ys, res) {
+		if (len(ys) == 0) {
+			return res;
+		}
+
+		var predicate = fn(head(ys));
+
+		if (predicate) 
+			return filter__(tail(ys), append(head(ys), res));
+		else filter__ 
+			return filter__(tail(ys), res);
+	}
+
+	return filter__(xs, List());
+}
+
+
+
+/* TODO(tyler): a function with no parameters 
+ * crashes when called. */
+fun main(a) {
+
+	var a = List(1,2,3);
+	print(a);
+
+	fun square(n) {return n * n; }
+
+	var b = map(square, a);
+	print(b);
+
+	fun large_number(n) {
+		/* TODO(tyler): shouldn't have to 
+		 * explicitly return here. */
+		if (n > 2)  { return true ; }
+		else        { return false ;}
+	}
+
+	var c = filter(large_number, b);
+	print(c);
+}
+
+main(1);
 ```
 
 ## Some Interesting Ideas

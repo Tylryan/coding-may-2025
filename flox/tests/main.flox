@@ -1,13 +1,31 @@
 
-fun curry(f) {
-	/* TODO(tyler): '_f' is currently not
-	 * allowed as an identifier as the scanner
-	 * doesn't pick up the preceding '_'. */
-	fun f_(arg) {
-		f(arg);
-		return null;
+fun map(fn, xs) { 
+	fun map__(ys, res) {
+		if (len(ys) == 0) {
+			return res;
+		}
+		var got_got = fn(head(ys));
+		return map__(tail(ys), append(got_got, res));
 	}
-	return f_;
+
+	return map__(xs, List());
+}
+
+fun filter(fn, xs) {
+	fun filter__(ys, res) {
+		if (len(ys) == 0) {
+			return res;
+		}
+
+		var predicate = fn(head(ys));
+
+		if (predicate) 
+			return filter__(tail(ys), append(head(ys), res));
+		else filter__ 
+			return filter__(tail(ys), res);
+	}
+
+	return filter__(xs, List());
 }
 
 
@@ -15,14 +33,23 @@ fun curry(f) {
 /* TODO(tyler): a function with no parameters 
  * crashes when called. */
 fun main(a) {
-	var my_print = curry(print);
-	my_print("Hello, World");
+
 	var a = List(1,2,3);
 	print(a);
 
-	var b = head(a);
-	var c = tail(a);
+	fun square(n) {return n * n; }
+
+	var b = map(square, a);
 	print(b);
+
+	fun large_number(n) {
+		/* TODO(tyler): shouldn't have to 
+		 * explicitly return here. */
+		if (n > 2)  { return true ; }
+		else        { return false ;}
+	}
+
+	var c = filter(large_number, b);
 	print(c);
 }
 

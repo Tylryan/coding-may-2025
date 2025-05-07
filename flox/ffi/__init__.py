@@ -14,3 +14,6 @@ def load_ffis(env: Env):
     env.define(fake_token("List"), List())
     env.define(fake_token("head"), Head())
     env.define(fake_token("tail"), Tail())
+    env.define(fake_token("append"), Append())
+    env.define(fake_token("prepend"), Prepend())
+    env.define(fake_token("len"), Len())
