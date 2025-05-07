@@ -1,29 +1,12 @@
 from __future__ import annotations
 
 
-from tokens import Token, TokenKind
+from tokens import Token, TokenKind, fake_token
 from exprs import *
 from lox_env import Env
 from flox_exceptions import FloxReturn
-
-@dataclass
-class FloxFun:
-    fun_dec: FunDec
-    closure: Env
-
-    def arity(self) -> int:
-        return len(self.fun_dec.params)
-
-    def call(self, args: list[object]) -> object:
-        env = Env(self.closure)
-
-        for i, param in enumerate(self.fun_dec.params):
-            env.define(param.token, args[i])
-
-        try:
-            eval_block(self.fun_dec.body, env)
-        except FloxReturn as fr:
-            return fr.value
+from flox_fun import FloxFun, FloxCallable
+from ffi.py_print import PythonPrint
 
 class Interpreter:
     env: Env
@@ -39,6 +22,7 @@ global interpreter
 def interpret(exprs: list[Expr]) -> None:
     global interpreter
     interpreter = Interpreter(exprs)
+    interpreter.env.define(fake_token("print"), PythonPrint())
 
     for expr in interpreter.exprs:
         evaluate(expr)
@@ -67,7 +51,7 @@ def evaluate(expr: Expr) -> object:
 def eval_fun_call(expr: FunCall) -> object:
     callee: object = evaluate(expr.name)
 
-    if isinstance(callee, FloxFun) is False:
+    if isinstance(callee, FloxCallable) is False:
         print(f"[interpreter-error] uncallable object "
               f"'{expr.name.token.lexeme}' on line {expr.name.token.line}.")
         exit(1)
@@ -77,7 +61,9 @@ def eval_fun_call(expr: FunCall) -> object:
         obj: object = evaluate(arg)
         args.append(obj)
     
-    return callee.call(args)
+    # NOTE(tyler): eval_block here is a
+    # function.
+    return callee.call(eval_block, args)
 
 
 def eval_return(ret: Return) -> object:
@@ -165,4 +151,4 @@ if __name__ == "__main__":
     from parser import parse
     from utils import read_file
 
-    interpret(parse(scan(read_file("tests/01-expr.flox"))))
+    interpret(parse(scan(read_file("tests/main.flox"))))
