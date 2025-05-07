@@ -33,7 +33,7 @@ class Env:
             return self.symbol_table[name.lexeme]
         
         if self.parent:
-            return self.get(name)
+            return self.parent.get(name)
         
         print(f"[environment-error] undefined variable "
               f"'{self.name.lexeme}' on line {self.name.line}.")

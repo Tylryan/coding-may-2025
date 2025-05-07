@@ -50,6 +50,7 @@ class TokenKind(Enum):
     DOT    = auto()
 
     EOF = auto()
+    __NONE__=auto()
 
 
 @dataclass
@@ -58,3 +59,6 @@ class Token:
     lexeme: str
     value : object
     line  : int
+
+def fake_token(lexeme: str = None, value: object = None) -> Token:
+    return Token(TokenKind.__NONE__, lexeme, value, -1)

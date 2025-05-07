@@ -21,6 +21,19 @@ fun fact(n) {
 }
 ```
 
+## Current Design Notes
+### Implicit Returns
+Pretty much anything that isn't a declaration (var, fun) returns
+a value. This means blocks even return values. More specifically,
+they return the value of the last evaluated expression.
+```js
+// 'a' == 1 because the last evaluated expression is '1'.
+var a = { 1 };
+// 'b' == 2 because the last evaluated expression in the
+// block expression is '2'.
+var b = { 1; 2 };
+```
+
 ## Some Interesting Ideas
 ### Preprocessor Work and Macros
 I'm thinking of a preprocessor with it's own mini language that will 
@@ -180,7 +193,7 @@ struct Binary  {
 
 extend Literal {
         fun as_map(self) -> HashMap[str, object] { 
-                hm: HashMap::new();
+                var hm = HashMap::new();
                 hm.put("literal", self.token.value);
                 return hm
         }
@@ -188,8 +201,8 @@ extend Literal {
 
 extend Binary {
         fun as_map(self) -> HashMap[str, object] { 
-                binary_expr: HashMap::new();
-                inner: HashMap::new();
+                var binary_expr =  HashMap::new();
+                var inner: HashMap::new();
 
                 inner.put("left", self.left.as_map());
                 inner.put("op", self.op);
@@ -222,4 +235,50 @@ fun main() {
         //}
 }
 
+```
+
+### Reference Counting
+At some point, I'd like to learn about Garbage Collection and I think the simplest
+place to start is Reference Counting.
+
+The MVP would be a language that had no GC by default and manual reference counting.
+#### Manual Reference Counting
+```rs
+fun create_person(name: str) -> Rc[Person] {
+        return Rc::track(Person(name));
+}
+
+fun main() {
+
+        person: Rc[Person] = create_person("Me");
+        other_person: Rc[Person] = create_person("You");
+
+        // Creates a reference cycle
+        person.friends.push(other_person);
+        Rc::add_ref(other_person)
+
+
+        // ... Other stuff ...
+
+        // Eventually will be freed when ref_count == 0
+        Rc::remove_ref(other_person);
+        Rc::remove_ref(person);
+
+        // Or free quickly if you no
+        // longer need it.
+        Rc::free(person);
+}
+```
+
+#### Automatic Reference Counting
+
+```rs
+Arc::remove();
+Arc::ref_count();
+Arc::strong();  // Same thing as Arc::track()
+Arc::ref();
+Arc::free();
+// Eventually we'll need to detect cycles like the one 
+// above.
+Arc::weak();
 ```
