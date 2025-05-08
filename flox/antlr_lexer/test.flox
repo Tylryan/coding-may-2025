@@ -1,0 +1,40 @@
+// Declarations
+class
+fun
+var
+const
+
+
+// Conditions
+if
+while
+for
+
+
+
+
+// Types
+1
+1.0
+"hello world"
+true
+false
+null
+
+// Operators
++ - * / %
+and or
+
+// Punctuation
+;
+(
+)
+{
+}
+
+// Single line comment
+/* Multi
+ * line
+ * comment */
+
+ _iden-tifier?
