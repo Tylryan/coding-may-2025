@@ -1,4 +1,5 @@
 
+/* (lexer | parser)? grammar IDENT ';' ; */
 lexer grammar FloxToken;
 
 /* Token types are just numbers, but they are ordered by 
@@ -12,66 +13,82 @@ lexer grammar FloxToken;
  * their 'type'.
  */
 
+/* NOTE: The higher the line number, the lower the
+ * precedence. For example, if you put IDENT on line
+ * 5 and CLASS on line 6, then 'class' would be marked
+ * as an IDENT!
+ */
+
 // Declarations
-CLASS    : 'class' -> type(1);
-FUN      : 'fun'   -> type(2);
-VAR      : 'var'   -> type(3);
-CONST    : 'const' -> type(4);
-FN       : 'fn'    -> type(5);
+CLASS    : 'class';
+FUN      : 'fun'  ;
+VAR      : 'var'  ;
+CONST    : 'const';
+FN       : 'fn'   ;
 
 
 // Conditions
-IF     : 'if'   -> type(10);
-WHILE  : 'while'-> type(11);
-FOR    : 'for'  -> type(12);
+IF     : 'if'   ;
+ELSE   : 'else' ;
+WHILE  : 'while';
+FOR    : 'for'  ;
 
 // Other Keywords
-RETURN    : 'return'   -> type(13);
-BREAK     : 'break'    -> type(14);
-CONTINUE  : 'continue' -> type(15);
+RETURN    : 'return'  ;
+BREAK     : 'break'   ;
+CONTINUE  : 'continue';
+
 
 // Types
-FLOAT    : DIGIT+ '.' DIGIT+ -> type(20);
-INT      : DIGIT+            -> type(21);
-STR      : '"' .*? '"'       -> type(22);
-TRUE     : 'true'            -> type(23);
-FALSE    : 'false'           -> type(24);
-NULL     : 'null'            -> type(25);
-IDENT    : [a-zA-Z_]+[\-!?]* -> type(26);
+FLOAT    : DIGIT+ '.' DIGIT+;
+INT      : DIGIT+           ;
+STR      : '"' .*? '"'      ;
+TRUE     : 'true'           ;
+FALSE    : 'false'          ;
+NULL     : 'null'           ;
 
+
+// Other Operators
+PLUS_PLUS    : '++';
+MINUS_MINUS  : '--' ;
 
 // Arithmetic Operators
-PLUS     : '+' -> type(40);
-MINUS    : '-' -> type(41);
-STAR     : '*' -> type(42);
-SLASH    : '/' -> type(43);
-MODULO   : '%' -> type(44);
+PLUS     : '+' ;
+MINUS    : '-' ;
+STAR     : '*' ;
+SLASH    : '/' ;
+MODULO   : '%' ;
 
 // Comparison Operators
-EQUAL         : '='  -> type(50);
-EQUAL_EQUAL   : '==' -> type(51);
-LESS          : '<'  -> type(52);
-LESS_EQUAL    : '<=' -> type(53);
-GREATER       : '>'  -> type(54);
-GREATER_EQUAL : '>=' -> type(54);
-BANG          : '!'  -> type(55);
-BANG_EQUAL    : '!=' -> type(56);
+EQUAL         : '=' ;
+EQUAL_EQUAL   : '==';
+LESS          : '<' ;
+LESS_EQUAL    : '<=';
+GREATER       : '>' ;
+GREATER_EQUAL : '>=';
+BANG          : '!' ;
+BANG_EQUAL    : '!=';
 
 // Logical Operators
-AND : 'and' -> type(60);
-OR  : 'or'  -> type(61);
+AND : 'and';
+OR  : 'or' ;
+
 
 // Punctuation
-SEMI      : ';' -> type(70);
-LPAR      : '(' -> type(71);
-RPAR      : ')' -> type(72);
-LBRACE    : '{' -> type(73);
-RBRACE    : '}' -> type(74);
-DOT       : '.' -> type(75);
+SEMI      : ';';
+LPAR      : '(';
+RPAR      : ')';
+LBRACE    : '{';
+RBRACE    : '}';
+DOT       : '.';
+COMMA     : ',';
 
 // Misc
-SL_COMMENT: '//' .*? '\n' -> type(100);
-ML_COMMENT: '/*' .*? '*/' -> type(101);
+SL_COMMENT: '//' .*? '\n';
+ML_COMMENT: '/*' .*? '*/';
+
+/* Must come after keywords */
+IDENT    : [a-zA-Z_]+[\-!?]* ;
 
 // Fragments
 fragment DIGIT    : [0-9] ;

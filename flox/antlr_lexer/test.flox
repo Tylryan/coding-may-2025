@@ -24,6 +24,8 @@ null
 // Operators
 + - * / %
 and or
+= == != 
+<> <= >=
 
 // Punctuation
 ;
@@ -38,3 +40,4 @@ and or
  * comment */
 
  _iden-tifier?
+

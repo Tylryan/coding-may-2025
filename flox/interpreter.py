@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-from tokens import Token, TokenKind
+from antlr_lexer.tokens import Token, TokenKind
 from exprs import *
 from lox_env import Env
 from flox_exceptions import FloxReturn
@@ -151,8 +151,9 @@ def eval_binary(expr: Binary) -> object:
         exit(1)
 
 if __name__ == "__main__":
-    from scanner import scan
+    from antlr_lexer.flox_lexer import lex
+    #from scanner import scan
     from parser import parse
     from utils import read_file
 
-    interpret(parse(scan(read_file("tests/main.flox"))))
+    interpret(parse(lex(read_file("tests/main.flox"))))

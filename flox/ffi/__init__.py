@@ -4,7 +4,7 @@ from ffi.py_os import PythonReadFile
 from ffi.py_print import PythonPrint
 from ffi.flox_list import *
 from lox_env import Env
-from tokens import fake_token
+from antlr_lexer.tokens import fake_token
 
 
 

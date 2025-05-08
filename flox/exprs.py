@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from tokens import Token, fake_token
+from antlr_lexer.tokens import Token, fake_token
 
 class Expr:
 

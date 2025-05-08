@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from tokens import Token, TokenKind
+from antlr_lexer.tokens import Token, TokenKind
 from exprs import *
 from utils import read_file
 
@@ -315,8 +315,8 @@ def at_end() -> bool:
     return parser.tokens[parser.index].kind == TokenKind.EOF
 
 if __name__ == "__main__":
-    from scanner import scan
-    tokens: list[Token] = scan(read_file("tests/main.flox"))
+    from antlr_lexer.flox_lexer import lex
+    tokens: list[Token] = lex(read_file("tests/main.flox"))
     exprs: list[Expr] = parse(tokens)
 
     from pprint import pprint

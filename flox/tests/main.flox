@@ -1,27 +1,28 @@
 
-fun map(fn, xs) { 
+fun map(_fn, xs) { 
 	fun map__(ys, res) {
 		if (len(ys) == 0) {
 			return res;
 		}
-		var got_got = fn(head(ys));
+		var got_got = _fn(head(ys));
 		return map__(tail(ys), append(got_got, res));
 	}
 
 	return map__(xs, List());
 }
 
-fun filter(fn, xs) {
+
+fun filter(_fn, xs) {
 	fun filter__(ys, res) {
 		if (len(ys) == 0) {
 			return res;
 		}
 
-		var predicate = fn(head(ys));
+		var predicate = _fn(head(ys));
 
 		if (predicate) 
 			return filter__(tail(ys), append(head(ys), res));
-		else filter__ 
+		else 
 			return filter__(tail(ys), res);
 	}
 

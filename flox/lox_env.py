@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from tokens import Token
+from antlr_lexer.tokens import Token
 from exprs import Expr
 
 class Env:
