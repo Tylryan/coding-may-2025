@@ -3,6 +3,12 @@ from time import sleep
 # I stumbled upon an interesting idea while writing 
 # a setup script for FreeBSD: turning a while loop
 # into a function.
+#
+# The code below demonstrates the advantage of such
+# a design by making it painfully obvious how easy
+# such a design is to extend. You can basically create
+# your own language constructs within a host language
+# using functions.
 def while_loop(code_block_fn) -> object:
     counter = 0
     while True:
@@ -10,16 +16,38 @@ def while_loop(code_block_fn) -> object:
         if returned: return val
 
         counter+=1
-    
-# With the 'while_loop' function declared above, you 
-# can create an 'attempt' function which is a while 
-# loop that only loops a maximum of 'n' times with
-# an increasing delay time.
-def attempt(code_block_fn, limit: int) -> object:
-    # Logic to extend while_loop.
+
+# A while loop with no while loop...
+def _while_loop(code_block_fn) -> object:
+    def __inner(counter):
+        returned, val = code_block_fn(counter)
+        if returned:
+            return val
+        __inner(counter + 1)
+
+    return __inner(0)
+
+# The while_loop can be extended by passing in a
+# new function that adds more logic to the while_loop.
+def until_loop(code_block_fn, limit: int) -> object:
+    # Logic to extend while_loop
     def fn(counter: int) -> bool:
         to_break, ret_val  = code_block_fn(counter)
         if counter >= limit or to_break: 
+            return (True, ret_val)
+
+        return (False, ret_val)
+
+    return while_loop(fn)
+
+# Now the until_loop can be extended by passing
+# in a new function to until_loop that adds more
+# logic.
+def attempt(code_block_fn, limit: int) -> object:
+    # Logic to extend until_loop.
+    def fn(counter: int) -> bool:
+        to_break, ret_val  = code_block_fn(counter)
+        if counter >= limit:
             return (True, ret_val)
 
         print(f"Delaying {counter} second(s).")
@@ -27,7 +55,7 @@ def attempt(code_block_fn, limit: int) -> object:
 
         return (False, ret_val)
 
-    return while_loop(fn)
+    return until_loop(fn, limit)
 
 
 def main():
@@ -43,9 +71,10 @@ def main():
 
         return (False, "Incorrect Answer!")
 
-    print("Will loop forever until is_right")
-    ret: object = while_loop(is_right)
-    print(ret)
+    #ret: object = _while_loop(is_right)
+    #print("Will loop forever until is_right")
+    #ret: object = while_loop(is_right)
+    #print(ret)
 
     limit=5
     print(f"Will only loop {limit} times. With an increasing delay.")
